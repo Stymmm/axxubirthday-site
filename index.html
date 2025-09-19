@@ -1,262 +1,1909 @@
-<!-- index.html - A single-file demo for "For Axxu" website
-     Instructions:
-     1) Save this file as index.html
-     2) Save your 6 photos in the same folder named: img1.jpg, img2.jpg, img3.jpg, img4.jpg, img5.jpg, img6.jpg (replace with your actual files)
-     3) If you want background music: replace AUDIO_SRC with a direct mp3 URL or uncomment the YouTube embed section and paste a YouTube link.
-     4) Deploy on GitHub Pages: create repo `axxubirthday`, upload index.html and images, enable Pages on main branch.
-
-     Built features:
-     - Hero with typewriter, floating hearts
-     - Timeline pre-filled with your dates
-     - Photo gallery + lightbox slideshow
-     - Music player (toggle)
-     - Countdown to 30 Sep 2025 which unlocks birthday surprise
-     - 22 Sep departure / LDR note
-     - Love Letter section (Hinglish) filled from your message
-     - Confetti + surprise popup when unlocked
--->
-
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>For Axxu — From Sam</title>
-  <style>
-    :root{
-      --bg:#fffafc; --card:#ffffff; --accent:#ff91b1; --muted:#7b6f79; --glass:rgba(255,255,255,0.6);
-      --shadow: 0 8px 30px rgba(14,14,20,0.07);
-    }
-    *{box-sizing:border-box}
-    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:linear-gradient(180deg,#fffafc 0%, #f6f6ff 100%); color:#333}
-    header{padding:56px 20px; text-align:center}
-    .hero{max-width:960px;margin:0 auto;padding:32px;border-radius:18px;backdrop-filter: blur(6px);box-shadow:var(--shadow);background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));}
-    .title{font-size:36px; font-weight:700; color:#3b2a3a}
-    .sub{margin-top:8px;color:var(--muted)}
-    .typewriter{color:var(--accent);font-weight:700}
-    .row{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center;margin-top:24px}
-    .card{background:var(--card);padding:16px;border-radius:14px;box-shadow:var(--shadow);width:320px}
-    .timeline{list-style:none;padding:0;margin:0}
-    .timeline li{padding:12px 0;border-bottom:1px dashed #eee}
-    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .gallery img{width:100%;height:150px;object-fit:cover;border-radius:8px;cursor:pointer}
-    .center{display:flex;align-items:center;justify-content:center}
-    .btn{background:linear-gradient(90deg,var(--accent),#e87ea5);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 6px 20px rgba(233,127,172,0.18);}
-    footer{padding:40px;text-align:center;color:var(--muted)}
-    .count{font-size:28px;font-weight:700}
-    .hearts{position:fixed;left:10px;top:10px;pointer-events:none}
-    .heart{width:18px;height:18px;background:var(--accent);display:inline-block;border-radius:4px;opacity:0.95;margin:6px;transform:rotate(45deg)}
-    .small{font-size:13px;color:#8d8d8d}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>For My Dearest Axxu — From Sam</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+<style>
+        :root {
+            --bg-primary: #fff5f8;
+            --bg-secondary: #ffffff;
+            --accent-primary: #f472b6; /* pink-400 */
+            --accent-secondary: #ec4899; /* pink-500 */
+            --text-primary: #581c87; /* violet-900 */
+            --text-secondary: #a855f7; /* purple-500 */
+            --text-muted: #868084;
+            --shadow: 0 10px 35px rgba(236, 72, 153, 0.1), 0 2px 10px rgba(0,0,0,0.04);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        .font-handwriting { font-family: 'Great Vibes', cursive; }
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 70%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 5s infinite;
+        }
+        @keyframes shine {
+            100% { left: 150%; }
+        }
 
-    /* lightbox */
-    .lightbox{position:fixed;inset:0;background:rgba(12,12,15,0.85);display:none;align-items:center;justify-content:center;z-index:999}
-    .lightbox img{max-width:92%;max-height:82%;border-radius:10px}
+        /* Custom Animated Hearts Background */
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-primary);
+            opacity: 0;
+            transform: rotate(45deg);
+            animation: floatUp 7s infinite linear;
+        }
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+        }
+        .heart::before { top: -10px; left: 0; }
+        .heart::after { top: 0; left: -10px; }
 
-    /* responsive */
-    @media(max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}.card{width:100%}}
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(45deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(45deg); opacity: 0; }
+        }
 
-    /* small animations */
-    .float{animation:float 4s ease-in-out infinite}
-    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+        /* Polaroid Gallery */
+        .polaroid {
+            background: white;
+            padding: 1rem;
+            padding-bottom: 2.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: scale(1.05) rotate(3deg) !important;
+            z-index: 10;
+        }
+        .polaroid img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .polaroid-caption {
+            text-align: center;
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        /* Love Letter Style */
+        .love-letter {
+            background: #fffaf0;
+            border: 1px solid #fde8e1;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            white-space: pre-line;
+            line-height: 1.8;
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            font-family: 'Georgia', serif;
+            color: #5c4033;
+        }
+        .love-letter::-webkit-scrollbar { width: 5px; }
+        .love-letter::-webkit-scrollbar-track { background: #fffaf0; }
+        .love-letter::-webkit-scrollbar-thumb { background: #fde8e1; border-radius: 10px; }
 
-    .confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}
+        /* Birthday Surprise Modal */
+        #birthdaySurpriseModal { transition: opacity 0.5s ease; }
+        #giftBox { animation: wiggle 2s ease-in-out infinite; cursor: pointer; }
+        @keyframes wiggle { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
+        #surpriseContent { display: none; }
 
-    .note{white-space:pre-line}
-  </style>
-</head>
-<body>
-  <div class="hearts">
-    <div class="heart float" style="background:linear-gradient(180deg,#ff9bb3,#ff6f9f);width:18px;height:18px"></div>
-    <div class="heart float" style="animation-delay:.6s;background:linear-gradient(#ffd2e6,#ff9bb3);width:14px;height:14px"></div>
-    <div class="heart float" style="animation-delay:1.1s;background:linear-gradient(#fbb1d6,#ff91b1);width:16px;height:16px"></div>
-  </div>
+        /* Confetti Canvas */
+        #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
 
-  <header>
-    <div class="hero">
-      <div class="title">For Axxu ❤️</div>
-      <div class="sub">From Sam — a little corner made with lots of shiddat</div>
-      <div style="margin-top:14px;font-size:18px"> <span class="typewriter" id="typewriter"></span></div>
+        /* Music Player Styles */
+        .music-section {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .control-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .control-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        .play-btn {
+            width: 70px;
+            height: 70px;
+            font-size: 1.5rem;
+        }
 
-      <div class="row">
-        <div class="card">
-          <div style="font-weight:700">Countdown to her birthday</div>
-          <div style="margin-top:12px" class="center">
-            <div>
-              <div class="count" id="countdown">-- days</div>
-              <div class="small">30 Sept 2025</div>
-            </div>
-          </div>
-          <div style="margin-top:12px" class="center">
-            <button class="btn" id="surpriseBtn">Open Surprise</button>
-          </div>
-        </div>
+        /* Advanced Birthday Screen Styles */
+        #birthdayScreen {
+            background: linear-gradient(135deg, #ff6ec7, #ff9a9e, #a8e6cf);
+            min-height: 100vh;
+            overflow-y: auto;
+            z-index: 10000;
+        }
 
-        <div class="card">
-          <div style="font-weight:700">Song I dedicate</div>
-          <div style="margin-top:10px">Shiddat</div>
-          <div style="margin-top:12px" class="center">
-            <button class="btn" id="playMusic">Play / Pause</button>
-          </div>
-          <div class="small" style="margin-top:12px">Tip: replace AUDIO_SRC in the HTML with a direct mp3 link or upload an audio file on server.</div>
-        </div>
+        /* Responsive Grid Fix */
+        .birthday-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-        <div class="card">
-          <div style="font-weight:700">Long-distance note</div>
-          <div style="margin-top:10px" class="small">22 Sept — Sam leaves for Bihar. Distance begins but love is constant.</div>
-          <div style="margin-top:12px" class="small">Click "Open Surprise" on 30 Sep to reveal birthday special.</div>
-        </div>
-      </div>
+        @media (max-width: 768px) {
+            .birthday-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 0.5rem;
+            }
+        }
+
+        /* Enhanced Birthday Cake */
+        .birthday-cake {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            cursor: pointer;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .cake-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .cake-base {
+            width: 180px;
+            height: 80px;
+            background: linear-gradient(45deg, #8B4513, #CD853F, #DEB887);
+            border-radius: 15px 15px 40px 40px;
+            position: absolute;
+            bottom: 20px;
+            left: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            animation: cakeGlow 2s ease-in-out infinite alternate;
+        }
+
+        .cake-middle {
+            width: 160px;
+            height: 60px;
+            background: linear-gradient(45deg, #FFB6C1, #FFC0CB, #FFE4E1);
+            border-radius: 12px 12px 30px 30px;
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .cake-top {
+            width: 140px;
+            height: 50px;
+            background: linear-gradient(45deg, #FF69B4, #FFB6C1, #FFF0F5);
+            border-radius: 10px 10px 25px 25px;
+            position: absolute;
+            bottom: 120px;
+            left: 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        @keyframes cakeGlow {
+            0% { box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+            100% { box-shadow: 0 15px 40px rgba(255,182,193,0.6), 0 0 20px rgba(255,105,180,0.4); }
+        }
+
+        .candle {
+            width: 8px;
+            height: 35px;
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            position: absolute;
+            top: 85px;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .candle:hover {
+            transform: scale(1.1);
+        }
+
+        .flame {
+            width: 14px;
+            height: 18px;
+            background: radial-gradient(circle at center, #FF4500 0%, #FF6347 30%, #FFD700 70%, #FFA500 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            top: -15px;
+            left: -3px;
+            animation: flicker 1.5s infinite alternate;
+            cursor: pointer;
+        }
+
+        .flame.blown-out {
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease;
+        }
+
+        @keyframes flicker {
+            0% { 
+                transform: rotate(-2deg) scale(1);
+                box-shadow: 0 0 10px #FF6347;
+            }
+            100% { 
+                transform: rotate(2deg) scale(1.1);
+                box-shadow: 0 0 15px #FFD700, 0 0 25px #FF4500;
+            }
+        }
+
+        /* Smoke Effect */
+        .smoke {
+            position: absolute;
+            top: -10px;
+            left: 2px;
+            width: 10px;
+            height: 10px;
+            background: rgba(200, 200, 200, 0.7);
+            border-radius: 50%;
+            animation: smokeRise 2s ease-out forwards;
+        }
+
+        @keyframes smokeRise {
+            0% {
+                opacity: 0.7;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px) scale(2);
+            }
+        }
+
+        /* Center Screen Cake Modal */
+        .center-cake-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11000;
+            background: rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            animation: cakeModalAppear 0.5s ease-out;
+        }
+
+        .center-cake {
+            width: 300px;
+            height: 250px;
+            position: relative;
+            margin: 0 auto;
+            animation: cakeGlowCenter 1s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 30px rgba(255,215,0,0.8));
+        }
+
+        @keyframes cakeGlowCenter {
+            0% { filter: drop-shadow(0 0 30px rgba(255,215,0,0.8)); }
+            100% { filter: drop-shadow(0 0 50px rgba(255,182,193,1)) drop-shadow(0 0 70px rgba(255,105,180,0.8)); }
+        }
+
+        @keyframes cakeModalAppear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .center-candle {
+            width: 15px;
+            height: 60px;
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+        }
+
+        .center-flame {
+            width: 25px;
+            height: 30px;
+            background: radial-gradient(circle at center, #FF4500 0%, #FF6347 30%, #FFD700 70%, #FFA500 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            top: -25px;
+            left: -5px;
+            animation: centerFlicker 1.5s infinite alternate;
+            cursor: pointer;
+        }
+
+        @keyframes centerFlicker {
+            0% { 
+                transform: rotate(-3deg) scale(1);
+                box-shadow: 0 0 20px #FF6347, 0 0 40px #FFD700;
+            }
+            100% { 
+                transform: rotate(3deg) scale(1.2);
+                box-shadow: 0 0 30px #FFD700, 0 0 50px #FF4500;
+            }
+        }
+
+        /* Enhanced Balloon Styles */
+        .balloon {
+            width: 60px;
+            height: 80px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            cursor: pointer;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+            box-shadow: inset -10px -10px 0 rgba(0,0,0,0.1);
+        }
+
+        .balloon:hover {
+            transform: scale(1.1);
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            width: 2px;
+            height: 25px;
+            background: #333;
+            transform: translateX(-50%);
+        }
+
+        .balloon.popped {
+            animation: balloonPop 0.3s ease-out forwards;
+        }
+
+        @keyframes balloonPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Balloon Burst Animation */
+        .burst-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11000;
+            animation: burstGlow 0.8s ease-out;
+        }
+
+        .burst-item {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            animation: burstSpin 1s ease-out;
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
+        }
+
+        @keyframes burstGlow {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes burstSpin {
+            0% { transform: rotateY(0deg) scale(0.5); }
+            100% { transform: rotateY(360deg) scale(1); }
+        }
+
+        /* Enhanced Gift Box */
+        .gift-box {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(45deg, #ff6b9d, #ec4899);
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: giftBounce 2s infinite ease-in-out;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .gift-box:hover {
+            transform: scale(1.1);
+        }
+
+        .gift-box::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 32px;
+            width: 6px;
+            height: 76px;
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            border-radius: 3px;
+        }
+
+        .gift-box::after {
+            content: '';
+            position: absolute;
+            top: 32px;
+            left: -3px;
+            width: 76px;
+            height: 6px;
+            background: linear-gradient(to right, #FFD700, #FFA500);
+            border-radius: 3px;
+        }
+
+        @keyframes giftBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* 3D Gift Center Modal */
+        .gift-center-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            z-index: 11000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: giftModalAppear 0.5s ease-out;
+        }
+
+        @keyframes giftModalAppear {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* 3D Items */
+        .item-3d {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            cursor: pointer;
+            animation: itemGlowCenter 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes itemGlowCenter {
+            0% { 
+                transform: rotateY(0deg) scale(1);
+                filter: drop-shadow(0 0 20px rgba(255,105,180,0.8));
+            }
+            100% { 
+                transform: rotateY(360deg) scale(1.1);
+                filter: drop-shadow(0 0 40px rgba(255,215,0,1)) drop-shadow(0 0 60px rgba(255,105,180,0.8));
+            }
+        }
+
+        /* Ice Cream 3D */
+        .icecream-3d {
+            background: linear-gradient(45deg, #FFB6C1, #FFC0CB);
+            border-radius: 50% 50% 20px 20px;
+            position: relative;
+        }
+
+        .icecream-3d::before {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 40%;
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 35px solid #D2691E;
+        }
+
+        .icecream-3d::after {
+            content: '🍦';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+        }
+
+        /* Chocolate 3D */
+        .chocolate-3d {
+            background: linear-gradient(45deg, #8B4513, #D2691E);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .chocolate-3d::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            background: repeating-linear-gradient(
+                45deg,
+                #A0522D 0px,
+                #A0522D 12px,
+                #8B4513 12px,
+                #8B4513 24px
+            );
+            border-radius: 8px;
+        }
+
+        .chocolate-3d::after {
+            content: '🍫';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+        }
+
+        /* Car 3D */
+        .car-3d {
+            background: linear-gradient(45deg, #FF6347, #FF4500);
+            border-radius: 20px 20px 8px 8px;
+            position: relative;
+        }
+
+        .car-3d::before,
+        .car-3d::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            width: 24px;
+            height: 24px;
+            background: #333;
+            border-radius: 50%;
+        }
+
+        .car-3d::before { left: 15px; }
+        .car-3d::after { right: 15px; }
+
+        /* Lollipop 3D */
+        .lollipop-3d {
+            background: radial-gradient(circle, #FF69B4, #FFB6C1);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .lollipop-3d::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            width: 6px;
+            height: 45px;
+            background: #8B4513;
+            transform: translateX(-50%);
+            border-radius: 3px;
+        }
+
+        /* Enhanced Scratch Card */
+        .scratch-card {
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(45deg, #C0C0C0, #808080);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .scratch-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #C0C0C0, #A9A9A9, #808080);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            transition: all 0.5s ease;
+        }
+
+        .scratch-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255,255,255,0.1) 0px,
+                rgba(255,255,255,0.1) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+        }
+
+        .scratch-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #ff6b9d, #ec4899);
+            color: white;
+            font-size: 9px;
+            padding: 3px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Realistic Wish Tree */
+        .wish-tree {
+            width: 200px;
+            height: 250px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .tree-trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 80px;
+            background: linear-gradient(to bottom, #8B4513, #654321);
+            border-radius: 5px;
+        }
+
+        .tree-foliage {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, #228B22, #006400, #2E8B57);
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .wish-box {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            color: #333;
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            border: 2px solid #FFF;
+        }
+
+        .wish-box:hover {
+            transform: scale(1.2);
+            background: linear-gradient(45deg, #FF6347, #FF4500);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255,99,71,0.5);
+        }
+
+        .wish-box.filled {
+            background: linear-gradient(45deg, #32CD32, #228B22);
+            color: white;
+        }
+
+        /* Media Player Enhancements */
+        .media-player {
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .media-btn {
+            background: linear-gradient(45deg, #ff6b9d, #ec4899);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(255,107,157,0.3);
+        }
+
+        .media-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255,107,157,0.5);
+        }
+</style>
+  </head>
+  <body class="bg-rose-50 antialiased">
+    <div class="hearts-container" id="hearts-container"></div>
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Header Section -->
+	<header class="text-center py-12 px-4 relative overflow-hidden">
+	  <div class="absolute inset-0 bg-gradient-to-b from-pink-200 to-transparent opacity-30"></div>
+	  <div class="relative z-10">
+		<h1 class="font-handwriting text-6xl md:text-8xl text-pink-500 drop-shadow-lg">For My Axxu</h1>
+		<p class="text-violet-800 mt-2 text-xs md:text-sm max-w-xs mx-auto">From Sam — a little universe crafted with all my love, for my favorite star.</p>
+	  </div>
+	</header>
+
+	<main class="max-w-6xl mx-auto px-4 pb-12">
+
+	  <!-- Countdown & LDR Card -->
+	  <section class="mb-12 bg-white rounded-2xl p-6 md:p-8 shadow-lg relative -mt-16 z-20">
+		<div class="flex flex-col md:flex-row items-center justify-between gap-8">
+		  <div class="text-center">
+			<h2 class="text-2xl font-bold text-violet-800 mb-2">The Big Day Countdown</h2>
+			<div id="countdown" class="text-5xl font-bold text-pink-500 bg-pink-100 px-4 py-2 rounded-lg inline-block">-- days</div>
+			<p class="text-sm text-gray-500 mt-2">Until September 30, 2025</p>
+			<button id="surpriseBtn" class="mt-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:scale-105 transform transition-transform shine-effect disabled:opacity-50 disabled:cursor-not-allowed">
+			  Unlock Birthday Surprise
+			</button>
+		  </div>
+		  <div class="w-full md:w-1/2 bg-violet-100 p-4 rounded-lg text-center">
+			<h3 class="font-bold text-violet-800">A Note Across the Miles</h3>
+			<p class="text-sm text-violet-700 mt-2">"Though miles may lie between us, we're never far apart, for love doesn't count the miles, it's measured by the heart."<br/><strong>22 Sept — a new chapter begins.</strong></p>
+		  </div>
+		</div>
+	  </section>
+
+	  <!-- Our Story Timeline -->
+	  <section class="mb-12">
+		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">Our Storybook</h2>
+		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+		  <!-- Timeline items will be dynamically inserted here -->
+		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			<p class="font-bold text-pink-500">31 July 2022</p><p class="text-sm text-gray-600">Our first text. A single notification that changed my world.</p>
+		  </div>
+		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			<p class="font-bold text-pink-500">15 Aug 2022</p><p class="text-sm text-gray-600">The day you accepted. The day our forever began.</p>
+		  </div>
+		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			<p class="font-bold text-pink-500">06 May 2024</p><p class="text-sm text-gray-600">Our first meeting. You were even more beautiful than I imagined.</p>
+		  </div>
+		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			<p class="font-bold text-pink-500">24 Jun 2025</p><p class="text-sm text-gray-600">Garadiya Mahadev. A film-like rainy day, just us against the world.</p>
+		  </div>
+		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			<p class="font-bold text-pink-500">01 Sep 2025</p><p class="text-sm text-gray-600">Karneshwar Mahadev Adventure. The day we felt like husband and wife at the Gurudwara.</p>
+		  </div>
+		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			<p class="font-bold text-pink-500">22 sep 2025</p><p class="text-sm text-gray-600">Last Day in Kota, Leaving Your City not your heart.</p>
+		  </div>
+		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			<p class="font-bold text-pink-500">Today</p><p class="text-sm text-gray-600">Making more memories, still in living in flasbacks, falling in love with you more each second.</p>
+		  </div>
+		</div>
+	  </section>
+
+	  <!-- Photo Gallery -->
+	  <section class="mb-12">
+		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">A Polaroid of Us</h2>
+		<div id="gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+		  <!-- Images will be injected here -->
+		</div>
+	  </section>
+
+	  <!-- Love Letter -->
+	  <section class="mb-12">
+		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">A Letter from My Heart</h2>
+		<div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+		  <div class="love-letter" id="loveLetter">
+			<!-- Letter content is injected by JS -->
+		  </div>
+		</div>
+	  </section>
+
+	  <!-- Music Section -->
+	  <section class="mb-12">
+		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">Our Songs</h2>
+		<div class="music-section">
+		  <h3 class="text-2xl font-bold mb-2">Shiddat — Our Dedicated Song</h3>
+		  <p class="mb-4">Because that's what I feel for you, infinite shiddat ❤️</p>
+
+		  <div class="music-controls">
+			<button class="control-btn" id="prevBtn">⏮️</button>
+			<button class="control-btn play-btn" id="playBtn">▶️</button>
+			<button class="control-btn" id="nextBtn">⏭️</button>
+		  </div>
+
+		  <div class="mt-4">
+			<p id="currentSong" class="text-sm opacity-90">Background Music</p>
+		  </div>
+
+		  <!-- Hidden Audio Elements -->
+		  <audio id="bgMusic" loop>
+			<source src="bg-music.mp3" type="audio/mpeg">
+		  </audio>
+		  <audio id="shiddatMusic">
+			<source src="shiddat.mp3" type="audio/mpeg">
+		  </audio>
+		</div>
+	  </section>
+
+    </main>
+
+    <footer class="text-center py-8 text-violet-800 text-sm">
+	  <p>Made with shiddat by your Sam, forever and always ❤️</p>
+    </footer>
+
+    <!-- Birthday Surprise Modal -->
+    <div id="birthdaySurpriseModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[999] opacity-0 pointer-events-none">
+	  <div id="modalContent" class="bg-gradient-to-br from-rose-100 to-violet-200 rounded-2xl p-8 max-w-lg w-full text-center shadow-2xl transform scale-95 transition-transform duration-500">
+		<div id="giftBox">
+		  <h2 class="font-handwriting text-5xl text-violet-800">Happy Birthday, My Love!</h2>
+		  <p class="text-violet-700 my-4">I have a special gift for you. Click the box to open it!</p>
+		  <svg class="w-32 h-32 mx-auto text-pink-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 5a3 3 0 013-3h4a3 3 0 013 3v2h-2V5a1 1 0 10-2 0v2H8V5a1 1 0 00-2 0v2H5V5zm10 4H5a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1v-6a1 1 0 00-1-1z" clip-rule="evenodd"></path><path d="M4 2a2 2 0 012-2h8a2 2 0 012 2v1h-1v-1a1 1 0 10-2 0v1H6v-1a1 1 0 10-2 0V2z"></path></svg>
+		</div>
+		<div id="surpriseContent">
+		  <h3 class="text-2xl font-bold text-violet-900">A Promise...</h3>
+		  <p class="mt-4 text-violet-800">
+			My dearest Axxu, on your birthday, I promise to fill your days with laughter, your heart with love, and your life with endless adventure. I promise to be your rock, your cheerleader, and your partner in crime, always and forever. This website is just a small token of my love. The real gift is the future we'll build together.
+		  </p>
+		  <button id="closeModalBtn" class="mt-6 bg-white text-pink-500 font-bold py-2 px-6 rounded-full shadow-md hover:bg-pink-50 transition-colors">Close</button>
+		</div>
+	  </div>
     </div>
-  </header>
 
-  <main style="max-width:1000px;margin:28px auto;padding:0 18px">
-    <section style="margin-bottom:26px">
-      <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
-        <div style="flex:1;min-width:280px" class="card">
-          <h3>Our Story — From Strangers to Soulmates</h3>
-          <ul class="timeline">
-            <li><strong>31 July 2022 — 03:07 p.m.</strong><div class="small">Our first text</div></li>
-            <li><strong>11 Aug 2022 — 05:56 p.m.</strong><div class="small">First proposal</div></li>
-            <li><strong>13 Aug 2022 — 05:38 p.m.</strong><div class="small">You were impressed by my trivial line</div></li>
-            <li><strong>13 Aug 2022 — 05:44 p.m.</strong><div class="small">Our goals matched</div></li>
-            <li><strong>15 Aug 2022 — 06:01 a.m.</strong><div class="small">You asked me to propose back</div></li>
-            <li><strong>15 Aug 2022 — 11:54 a.m.</strong><div class="small">I proposed</div></li>
-            <li><strong>15 Aug 2022 — 12:00 p.m.</strong><div class="small">You accepted</div></li>
-            <li><strong>06 May 2023</strong><div class="small">Our first meet up</div></li>
-          </ul>
-        </div>
+    <!-- Advanced Birthday Surprise Screen -->
+    <div id="birthdayScreen" class="fixed inset-0 z-[10000] hidden overflow-y-auto">
+	  <div class="min-h-screen p-2">
+		<!-- Header -->
+		<div class="text-center py-4 relative">
+		  <button id="closeBirthdayScreen" class="absolute top-2 right-4 bg-white text-pink-500 rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold hover:bg-pink-50 transition-colors z-50">
+			✕
+		  </button>
+		  <h1 class="font-handwriting text-3xl md:text-5xl text-white drop-shadow-lg mb-2">
+			🎉 Happy Birthday Axxu! 🎉
+		  </h1>
+		  <p class="text-white text-sm md:text-base opacity-90">Your Special 18th Birthday Experience</p>
+		</div>
 
-        <div style="width:340px" class="card">
-          <h4>Quick moments</h4>
-          <p class="small">Highlights: Garadiya Mahadev — 24 Jun 2025 (film-like rainy day). Bhanwar Kunj & Gurudwara — 1 Sep 2025 (adventure + special website gift)</p>
-          <p class="small">Dreams: IIT together, IAS, same city, forever.</p>
-        </div>
-      </div>
-    </section>
+		<!-- Birthday Features Grid -->
+		<div class="birthday-grid">
 
-    <section style="margin-bottom:26px">
-      <div class="card">
-        <h3>Gallery</h3>
-        <div class="gallery" id="gallery">
-          <img src="img1.jpg" alt="photo1" data-index="0">
-          <img src="img2.jpg" alt="photo2" data-index="1">
-          <img src="img3.jpg" alt="photo3" data-index="2">
-          <img src="img4.jpg" alt="photo4" data-index="3">
-          <img src="img5.jpg" alt="photo5" data-index="4">
-          <img src="img6.jpg" alt="photo6" data-index="5">
-        </div>
-      </div>
-    </section>
+		  <!-- 3D Birthday Cake -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">🎂 Birthday Cake</h3>
+			<div class="birthday-cake" id="birthdayCake">
+			  <div class="cake-container">
+				<div class="cake-base"></div>
+				<div class="cake-middle"></div>
+				<div class="cake-top"></div>
+				<div class="candle" style="left: 60px;" data-candle="1">
+				  <div class="flame" data-flame="1"></div>
+				</div>
+				<div class="candle" style="left: 75px;" data-candle="2">
+				  <div class="flame" data-flame="2"></div>
+				</div>
+				<div class="candle" style="left: 90px;" data-candle="3">
+				  <div class="flame" data-flame="3"></div>
+				</div>
+				<div class="candle" style="left: 105px;" data-candle="4">
+				  <div class="flame" data-flame="4"></div>
+				</div>
+				<div class="candle" style="left: 120px;" data-candle="5">
+				  <div class="flame" data-flame="5"></div>
+				</div>
+			  </div>
+			</div>
+			<p class="text-white text-xs mt-2">Click cake for special candle!</p>
+		  </div>
 
-    <section style="margin-bottom:26px">
-      <div class="card">
-        <h3>Love Letter (for Axxu)</h3>
-        <div class="note small" id="loveLetter">
-<!-- The letter below is the Hinglish text Sam provided. Edit anytime. -->
-Beb,
+		  <!-- Balloon Pop Game -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">🎈 Pop Balloons</h3>
+			<div class="grid grid-cols-2 gap-2" id="balloonGame">
+			  <!-- Balloons will be generated by JavaScript -->
+			</div>
+			<p class="text-white text-xs mt-2">Pop for surprises!</p>
+		  </div>
 
-Jab main yeh bol raha hoon, toh dil bohot bhaari sa lag raha hai. ...
+		  <!-- Voice Message -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">🔊 Voice Message</h3>
+			<div class="media-player">
+			  <p class="text-xs mb-3">Happy Birthday from Sam ❤️</p>
+			  <button class="media-btn text-sm" id="playVoiceBtn">🎵 Play Voice Note</button>
+			  <audio id="birthdayVoice">
+				<source src="birthday-voice.mp3" type="audio/mpeg">
+			  </audio>
+			</div>
+		  </div>
 
-(Full letter included in the HTML. Replace or edit as needed.)
-        </div>
-      </div>
-    </section>
+		  <!-- Video Message -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">📹 Video Surprise</h3>
+			<div class="media-player">
+			  <p class="text-xs mb-3">Special video for you!</p>
+			  <button class="media-btn text-sm" id="playVideoBtn">📺 Watch Video</button>
+			</div>
+		  </div>
 
-    <section style="margin-bottom:26px">
-      <div class="card">
-        <h3>Song + Player</h3>
-        <p class="small">Song dedicated: <strong>Shiddat</strong></p>
-        <!-- Audio placeholder: Replace AUDIO_SRC with an mp3 URL or upload audio file and use the filename -->
-        <audio id="audio" loop>
-          <source src="AUDIO_SRC.mp3" type="audio/mpeg">
-          <!-- If you want a YouTube embed instead, replace or add below -->
-        </audio>
-      </div>
-    </section>
+		  <!-- Gift Boxes -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">🎁 Gift Boxes</h3>
+			<div class="grid grid-cols-2 gap-2" id="giftBoxes">
+			  <!-- Gift boxes will be generated by JavaScript -->
+			</div>
+			<p class="text-white text-xs mt-2">Click to unwrap!</p>
+		  </div>
 
-  </main>
+		  <!-- Her Special Photos -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">📸 Your Beautiful Photos</h3>
+			<div class="grid grid-cols-2 gap-2" id="axxuPhotos">
+			  <img src="axxu1.jpg" alt="Axxu 1" class="w-full h-20 object-cover rounded-lg border-2 border-yellow-300 cursor-pointer transition-all hover:scale-105" style="animation: rotate 10s linear infinite;">
+			  <img src="axxu2.jpg" alt="Axxu 2" class="w-full h-20 object-cover rounded-lg border-2 border-yellow-300 cursor-pointer transition-all hover:scale-105" style="animation: rotate 12s linear infinite;">
+			  <img src="axxu3.jpg" alt="Axxu 3" class="w-full h-20 object-cover rounded-lg border-2 border-yellow-300 cursor-pointer transition-all hover:scale-105" style="animation: rotate 14s linear infinite;">
+			  <img src="axxu4.jpg" alt="Axxu 4" class="w-full h-20 object-cover rounded-lg border-2 border-yellow-300 cursor-pointer transition-all hover:scale-105" style="animation: rotate 16s linear infinite;">
+			</div>
+		  </div>
 
-  <footer>
-    Made with shiddat by Sam • <span class="small">Public link when you deploy: https://stymmm.github.io/axxubirthday</span>
-  </footer>
+		  <!-- Scratch Cards -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">🎫 Scratch Cards</h3>
+			<div class="grid grid-cols-2 gap-2" id="scratchCards">
+			  <!-- Scratch cards will be generated by JavaScript -->
+			</div>
+		  </div>
 
-  <div class="lightbox" id="lightbox">
-    <img src="" id="lightboxImg">
-  </div>
+		  <!-- Confetti Cannon -->
+		  <div class="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+			<h3 class="text-white font-bold mb-4 text-sm">🎊 Confetti Cannon</h3>
+			<div class="flex flex-col items-center">
+			  <button class="media-btn text-2xl mb-2" id="confettiBtn">🎉</button>
+			  <p class="text-white text-xs">Celebrate!</p>
+			</div>
+		  </div>
 
-  <canvas class="confetti" id="confettiCanvas"></canvas>
+		</div>
 
-  <script>
-    // Simple typewriter
-    const phrases = ["For my Axxu","My forever corner","Made with shiddat ❤️"];
-    let i=0,j=0,cur='';function type(){
-      const el = document.getElementById('typewriter');
-      if(!el) return;
-      if(j<phrases[i].length){cur+=phrases[i][j++];el.textContent=cur;setTimeout(type,80)}else{setTimeout(()=>{erase()},1000)}
+		<!-- Wish Tree Section -->
+		<div class="max-w-4xl mx-auto mt-6 bg-white/20 backdrop-blur-md rounded-xl p-4 text-center">
+		  <h2 class="font-handwriting text-2xl md:text-3xl text-white mb-4">🌳 Christmas Wish Tree</h2>
+		  <p class="text-white text-sm mb-4">Click on any golden ornament to write your wish. I'll fulfill them all! 💖</p>
+
+		  <div class="wish-tree mx-auto relative">
+			<div class="tree-trunk"></div>
+			<div class="tree-foliage"></div>
+			<!-- Wish boxes positioned on tree -->
+			<div class="wish-box" style="top: 40px; left: 80px;" data-wish="1">1</div>
+			<div class="wish-box" style="top: 30px; right: 70px;" data-wish="2">2</div>
+			<div class="wish-box" style="top: 60px; left: 50px;" data-wish="3">3</div>
+			<div class="wish-box" style="top: 55px; right: 45px;" data-wish="4">4</div>
+			<div class="wish-box" style="top: 80px; left: 90px;" data-wish="5">5</div>
+			<div class="wish-box" style="top: 75px; right: 85px;" data-wish="6">6</div>
+			<div class="wish-box" style="top: 100px; left: 60px;" data-wish="7">7</div>
+			<div class="wish-box" style="top: 95px; right: 55px;" data-wish="8">8</div>
+			<div class="wish-box" style="top: 120px; left: 85px;" data-wish="9">9</div>
+			<div class="wish-box" style="top: 115px; right: 80px;" data-wish="10">10</div>
+		  </div>
+
+		  <div class="mt-4">
+			<button class="media-btn text-sm" id="viewWishesBtn">📝 View All Wishes (Admin)</button>
+		  </div>
+		</div>
+	  </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[10001] hidden">
+	  <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4">
+		<div class="flex justify-between items-center mb-4">
+		  <h3 class="text-xl font-bold">Special Video Message ❤️</h3>
+		  <button id="closeVideoModal" class="text-2xl hover:text-red-500 transition-colors">✕</button>
+		</div>
+		<video id="surpriseVideo" controls class="w-full rounded-lg">
+		  <source src="surprise-video.mp4" type="video/mp4">
+		</video>
+	  </div>
+    </div>
+
+    <!-- Lightbox for Gallery - UPDATED Z-INDEX -->
+	<div id="lightbox" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[10001] hidden p-4">
+	  <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl">
+	  <button id="closeLightbox" class="absolute top-4 right-4 text-white text-4xl">&times;</button>
+	</div>
+	
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Sound effects (using Web Audio API for realistic sounds)
+    function playSound(type) {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let frequency, duration;
+        
+        switch(type) {
+            case 'blow':
+                frequency = 200;
+                duration = 0.5;
+                break;
+            case 'pop':
+                frequency = 800;
+                duration = 0.2;
+                break;
+            case 'unwrap':
+                frequency = 400;
+                duration = 0.3;
+                break;
+            default:
+                frequency = 440;
+                duration = 0.1;
+        }
+        
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + duration);
     }
-    function erase(){const el=document.getElementById('typewriter'); if(j>0){cur=cur.slice(0,-1);j--;el.textContent=cur;setTimeout(erase,40)}else{i=(i+1)%phrases.length; setTimeout(type,200)} }
-    type();
 
-    // Gallery lightbox
-    const gallery = document.getElementById('gallery');
-    const lb = document.getElementById('lightbox');
-    const lbImg = document.getElementById('lightboxImg');
-    gallery.querySelectorAll('img').forEach(img=>{
-      img.addEventListener('click', e=>{lbImg.src = e.target.src; lb.style.display='flex'})
-    })
-    lb.addEventListener('click', ()=>lb.style.display='none');
+    // --- Dynamic Hearts Background ---
+    const heartsContainer = document.getElementById('hearts-container');
+    const createHeart = () => {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.animationDuration = `${5 + Math.random() * 5}s`; // 5 to 10 seconds
+        heart.style.width = `${10 + Math.random() * 15}px`;
+        heart.style.height = heart.style.width;
+        
+        // Adjust psuedo elements size as well
+        const style = document.createElement('style');
+        const heartId = `heart-${Date.now()}-${Math.random()}`;
+        heart.id = heartId;
+        style.innerHTML = `
+            #${heartId}::before, #${heartId}::after {
+                width: ${heart.style.width};
+                height: ${heart.style.height};
+            }
+            #${heartId}::before { top: -${parseInt(heart.style.width)/2}px; }
+            #${heartId}::after { left: -${parseInt(heart.style.width)/2}px; }
+        `;
+        document.head.appendChild(style);
 
-    // Countdown
-    function updateCountdown(){
-      const end = new Date('2025-09-30T00:00:00');
-      const now = new Date();
-      const diff = end - now;
-      const el = document.getElementById('countdown');
-      if(diff<=0){el.textContent = 'Happy Birthday!'; document.getElementById('surpriseBtn').disabled=false;} else {
-        const days = Math.floor(diff/ (1000*60*60*24));
-        el.textContent = days + ' days';
-      }
+        heartsContainer.appendChild(heart);
+        setTimeout(() => {
+            heart.remove();
+            style.remove();
+        }, 10000);
+    };
+    setInterval(createHeart, 500);
+
+    // --- Countdown Logic ---
+    const countdownEl = document.getElementById('countdown');
+    const surpriseBtn = document.getElementById('surpriseBtn');
+    const targetDate = new Date('2025-09-30T00:00:00');
+
+    const updateCountdown = () => {
+        const now = new Date();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+            countdownEl.textContent = 'Happy Birthday!';
+            countdownEl.classList.add('animate-pulse');
+            surpriseBtn.disabled = false;
+        } else {
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            countdownEl.textContent = `${days} days`;
+            surpriseBtn.disabled = true; // Set to true for real deployment
+            // For DEMO purposes, let's keep it enabled. Change to true above to lock it.
+            surpriseBtn.disabled = false;
+        }
+    };
+    updateCountdown();
+    setInterval(updateCountdown, 1000 * 60 * 30); // update every 30 mins
+
+    // --- Advanced Birthday Screen Logic ---
+const birthdayScreen = document.getElementById('birthdayScreen');
+const closeBirthdayScreen = document.getElementById('closeBirthdayScreen');
+
+surpriseBtn.addEventListener('click', () => {
+    const now = new Date();
+    if (now < targetDate && surpriseBtn.disabled) {
+         // A nicer alert
+        const tempAlert = document.createElement('div');
+        tempAlert.textContent = 'Patience, my love! The best surprises are worth waiting for. 🎂';
+        tempAlert.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:white; color:var(--text-primary); padding:10px 20px; border-radius:20px; box-shadow:var(--shadow); z-index:9999;';
+        document.body.appendChild(tempAlert);
+        setTimeout(() => tempAlert.remove(), 3000);
+        return;
     }
-    updateCountdown(); setInterval(updateCountdown, 1000*60*30);
+    
+    birthdayScreen.classList.remove('hidden');
+    generateBalloons();
+    generateGiftBoxes();
+    generateScratchCards();
+    addAxxuPhotosClickHandler(); // ADD THIS LINE
+    showConfetti();
+});
 
-    // Surprise button
-    document.getElementById('surpriseBtn').addEventListener('click', ()=>{
-      // If before 30 Sep, show a cute message
-      const now = new Date();
-      const end = new Date('2025-09-30T00:00:00');
-      if(now < end){alert('Hold tight — Birthday surprise will unlock on 30 Sept 🎂'); return}
-      // show confetti + popup with message
-      showConfetti(); setTimeout(()=>{
-        alert('Happy Birthday Axxu ❤️\n\nOpen your secret letter and surprise inside the site ♥️');
-      },400)
+// Fixed close button
+closeBirthdayScreen.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    birthdayScreen.classList.add('hidden');
+});
+
+// ADD THIS FUNCTION
+function addAxxuPhotosClickHandler() {
+    const axxuPhotos = document.querySelectorAll('#axxuPhotos img');
+    axxuPhotos.forEach(photo => {
+        photo.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            lightboxImg.src = photo.src;
+            lightbox.classList.remove('hidden');
+        });
+    });
+}
+
+
+    // --- Enhanced Birthday Cake Logic (UPDATED) ---
+const birthdayCake = document.getElementById('birthdayCake');
+birthdayCake.addEventListener('click', () => {
+    showCenterCake();
+});
+
+function showCenterCake() {
+    const centerModal = document.createElement('div');
+    centerModal.className = 'center-cake-modal';
+    
+    centerModal.innerHTML = `
+        <div class="center-cake">
+            <div style="width: 270px; height: 120px; background: linear-gradient(45deg, #8B4513, #CD853F, #DEB887); border-radius: 20px 20px 60px 60px; position: absolute; bottom: 30px; left: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);"></div>
+            <div style="width: 240px; height: 90px; background: linear-gradient(45deg, #FFB6C1, #FFC0CB, #FFE4E1); border-radius: 15px 15px 45px 45px; position: absolute; bottom: 120px; left: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.4);"></div>
+            <div style="width: 210px; height: 75px; background: linear-gradient(45deg, #FF69B4, #FFB6C1, #FFF0F5); border-radius: 12px 12px 35px 35px; position: absolute; bottom: 180px; left: 45px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);"></div>
+            <div class="center-candle" id="centerCandle">
+                <div class="center-flame" id="centerFlame"></div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="cutCakeBtn" style="background: linear-gradient(45deg, #ff6b9d, #ec4899); color: white; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">🔪 Cut Cake</button>
+        </div>
+    `;
+    
+    document.body.appendChild(centerModal);
+    
+    const cutCakeBtn = centerModal.querySelector('#cutCakeBtn');
+    const centerFlame = centerModal.querySelector('#centerFlame');
+    
+    cutCakeBtn.addEventListener('click', () => {
+        // Cake cutting animation
+        cutCakeBtn.style.transform = 'scale(0)';
+        cutCakeBtn.style.opacity = '0';
+        
+        // Add cake cutting effect
+        const cakeDiv = centerModal.querySelector('.center-cake');
+        cakeDiv.style.animation = 'cakeCut 1s ease-out forwards';
+        
+        // Add cutting animation style
+        const cuttingStyle = document.createElement('style');
+        cuttingStyle.textContent = `
+            @keyframes cakeCut {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1) rotateZ(2deg); }
+                100% { transform: scale(1.05) rotateZ(0deg); filter: brightness(1.2); }
+            }
+        `;
+        document.head.appendChild(cuttingStyle);
+        
+        setTimeout(() => {
+            playSound('blow');
+            centerFlame.style.opacity = '0';
+            centerFlame.style.transform = 'scale(0)';
+            
+            setTimeout(() => {
+                showConfetti();
+                showBirthdayMessage();
+                setTimeout(() => {
+                    centerModal.remove();
+                    cuttingStyle.remove();
+                }, 3000);
+            }, 500);
+        }, 1000);
+    });
+}
+
+function showBirthdayMessage() {
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(45deg, #ff6b9d, #ec4899);
+        color: white;
+        padding: 40px;
+        border-radius: 25px;
+        z-index: 12000;
+        text-align: center;
+        font-size: 1.3rem;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        animation: messageAppear 0.8s ease-out;
+        max-width: 90%;
+    `;
+    
+    messageDiv.innerHTML = `
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">🎂 Happy 18th Birthday! 🎂</h2>
+        <p style="margin-bottom: 15px;">Cake Cut Successfully!</p>
+        <p style="margin-bottom: 25px;">Your Dreams Will Come True! ✨</p>
+        <button onclick="this.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem;">Amazing! 💕</button>
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes messageAppear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        if (document.body.contains(messageDiv)) {
+            messageDiv.remove();
+        }
+        style.remove();
+    }, 15000);
+}
+
+    // --- Enhanced Balloon Logic ---
+    function generateBalloons() {
+        const balloonGame = document.getElementById('balloonGame');
+        const balloonData = [
+            { color: '#FF69B4', item: '🍭' },
+            { color: '#FFD700', item: '🎀' },
+            { color: '#00CED1', item: '💎' },
+            { color: '#FF6347', item: '🌟' }
+        ];
+        
+        balloonGame.innerHTML = '';
+        balloonData.forEach((balloon, index) => {
+            const balloonEl = document.createElement('div');
+            balloonEl.className = 'balloon';
+            balloonEl.style.background = balloon.color;
+            balloonEl.dataset.item = balloon.item;
+            balloonGame.appendChild(balloonEl);
+        });
+        
+        // Add balloon click handlers
+        balloonGame.querySelectorAll('.balloon').forEach(balloon => {
+            balloon.addEventListener('click', () => {
+                const item = balloon.dataset.item;
+                
+                // Pop animation with sound
+                balloon.classList.add('popped');
+                playSound('pop');
+                
+                // Create burst animation
+                setTimeout(() => {
+                    createBurstAnimation(item);
+                }, 150);
+                
+                // Check if all balloons popped
+                setTimeout(() => {
+                    const remainingBalloons = balloonGame.querySelectorAll('.balloon:not(.popped)');
+                    if (remainingBalloons.length === 0) {
+                        setTimeout(() => {
+                            generateBalloons(); // Regenerate balloons
+                        }, 2000);
+                    }
+                }, 300);
+            });
+        });
+    }
+
+    function createBurstAnimation(item) {
+        const burstDiv = document.createElement('div');
+        burstDiv.className = 'burst-animation';
+        
+        burstDiv.innerHTML = `
+            <div class="burst-item" style="font-size: 4rem;">${item}</div>
+        `;
+        
+        document.body.appendChild(burstDiv);
+        
+        setTimeout(() => {
+            burstDiv.remove();
+        }, 2000);
+    }
+
+    // --- Enhanced Gift Boxes (UPDATED) ---
+function generateGiftBoxes() {
+    const giftBoxes = document.getElementById('giftBoxes');
+    const gifts = [
+        { type: 'icecream', name: '🍦 Sweet Ice Cream' },
+        { type: 'chocolate', name: '🍫 Delicious Chocolate' },
+        { type: 'car', name: '🚗 Dream Car' },
+        { type: 'lollipop', name: '🍭 Colorful Lollipop' }
+    ];
+    
+    giftBoxes.innerHTML = '';
+    gifts.forEach((gift, index) => {
+        const giftBox = document.createElement('div');
+        giftBox.className = 'gift-box';
+        giftBox.dataset.gift = gift.type;
+        giftBox.dataset.name = gift.name;
+        giftBoxes.appendChild(giftBox);
+    });
+        
+        // Add gift box click handlers
+    giftBoxes.querySelectorAll('.gift-box').forEach(box => {
+        box.addEventListener('click', () => {
+            const giftType = box.dataset.gift;
+            const giftName = box.dataset.name;
+            
+            playSound('unwrap');
+            box.style.animation = 'none';
+            box.style.transform = 'scale(0)';
+            
+            setTimeout(() => {
+                show3DGiftCenter(giftType, giftName);
+            }, 300);
+            
+            // Check if all gifts are opened
+            setTimeout(() => {
+                const remainingGifts = giftBoxes.querySelectorAll('.gift-box:not([style*="scale(0)"])');
+                if (remainingGifts.length === 0) {
+                    setTimeout(() => {
+                        generateGiftBoxes(); // Regenerate gift boxes
+                    }, 3000);
+                }
+            }, 500);
+        });
+    });
+}
+
+function show3DGiftCenter(type, name) {
+    const giftModal = document.createElement('div');
+    giftModal.className = 'gift-center-modal';
+    
+    let itemHTML = '';
+    switch(type) {
+        case 'icecream':
+            itemHTML = '<div class="item-3d icecream-3d"></div>';
+            break;
+        case 'chocolate':
+            itemHTML = '<div class="item-3d chocolate-3d"></div>';
+            break;
+        case 'car':
+            itemHTML = '<div class="item-3d car-3d"></div>';
+            break;
+        case 'lollipop':
+            itemHTML = '<div class="item-3d lollipop-3d"></div>';
+            break;
+    }
+    
+    giftModal.innerHTML = `
+        <div style="text-align: center; color: white;">
+            ${itemHTML}
+            <h3 style="font-size: 2rem; margin: 20px 0; color: white;">${name}</h3>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem;">Thank You! 💕</button>
+        </div>
+    `;
+    
+    document.body.appendChild(giftModal);
+    
+    setTimeout(() => {
+        if (document.body.contains(giftModal)) {
+            giftModal.remove();
+        }
+    }, 3000);
+}
+
+    // --- Enhanced Scratch Cards ---
+    function generateScratchCards() {
+        const scratchCards = document.getElementById('scratchCards');
+        const messages = [
+            'I love you mera bachha 🌍',
+            'Forever mine! 💕',
+            'Best girlfriend ever! 👸',
+            'Meri jaan! 💖'
+        ];
+        
+        scratchCards.innerHTML = '';
+        messages.forEach(message => {
+            const card = document.createElement('div');
+            card.className = 'scratch-card';
+            card.dataset.message = message;
+            
+            card.innerHTML = `
+                <div class="scratch-overlay">Scratch Me!</div>
+                <div class="scratch-content">${message}</div>
+            `;
+            
+            scratchCards.appendChild(card);
+        });
+        
+        // Add scratch card handlers
+        scratchCards.querySelectorAll('.scratch-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const overlay = card.querySelector('.scratch-overlay');
+                const message = card.dataset.message;
+                
+                overlay.style.opacity = '0';
+                overlay.style.transform = 'scale(1.2)';
+                
+                setTimeout(() => {
+                    showMessage(message);
+                }, 500);
+            });
+        });
+    }
+
+    // --- Voice Message ---
+    const playVoiceBtn = document.getElementById('playVoiceBtn');
+    const birthdayVoice = document.getElementById('birthdayVoice');
+    playVoiceBtn.addEventListener('click', () => {
+        if (birthdayVoice.paused) {
+            birthdayVoice.play().catch(e => console.log('Voice play failed:', e));
+            playVoiceBtn.textContent = '⏸️ Pause Voice';
+        } else {
+            birthdayVoice.pause();
+            playVoiceBtn.textContent = '🎵 Play Voice Note';
+        }
     });
 
-    // Audio play/pause
-    const audio = document.getElementById('audio');
-    document.getElementById('playMusic').addEventListener('click', ()=>{
-      if(audio.paused) {audio.play().catch(()=>alert('Please provide an audio file or a valid URL in index.html'))} else audio.pause();
-    })
+    // --- Video Message ---
+    const playVideoBtn = document.getElementById('playVideoBtn');
+    const videoModal = document.getElementById('videoModal');
+    const closeVideoModal = document.getElementById('closeVideoModal');
+    const surpriseVideo = document.getElementById('surpriseVideo');
 
-    // Simple confetti (canvas)
-    function showConfetti(){
-      const canvas = document.getElementById('confettiCanvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = innerWidth; canvas.height = innerHeight; canvas.style.display='block';
-      const pieces = [];
-      for(let i=0;i<150;i++) pieces.push({x:Math.random()*canvas.width,y:Math.random()*-canvas.height,vy:2+Math.random()*6, size:4+Math.random()*8, color:['#ff93b4','#ffd2e6','#ffe0b5','#b6f5e1'][Math.floor(Math.random()*4)]});
-      let t=0; function loop(){ctx.clearRect(0,0,canvas.width,canvas.height); pieces.forEach(p=>{p.y+=p.vy; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,p.size,p.size);}); t++; if(t<300) requestAnimationFrame(loop); else canvas.style.display='none'}
-      loop();
+    playVideoBtn.addEventListener('click', () => {
+        videoModal.classList.remove('hidden');
+        surpriseVideo.play().catch(e => console.log('Video play failed:', e));
+    });
+
+    closeVideoModal.addEventListener('click', () => {
+        videoModal.classList.add('hidden');
+        surpriseVideo.pause();
+    });
+
+    videoModal.addEventListener('click', (e) => {
+        if (e.target === videoModal) {
+            videoModal.classList.add('hidden');
+            surpriseVideo.pause();
+        }
+    });
+
+    // --- Enhanced Confetti Button (UPDATED) ---
+    const confettiBtn = document.getElementById('confettiBtn');
+    confettiBtn.addEventListener('click', () => {
+        showConfetti(); // Full screen confetti only
+    });
+
+    // --- Enhanced Wish Tree Logic ---
+    const wishBoxes = document.querySelectorAll('.wish-box');
+    const viewWishesBtn = document.getElementById('viewWishesBtn');
+
+    wishBoxes.forEach(box => {
+        // Check if wish exists and update appearance
+        const wishNum = box.dataset.wish;
+        const existingWish = localStorage.getItem(`wish_${wishNum}`);
+        if (existingWish) {
+            box.classList.add('filled');
+            box.textContent = '✓';
+        }
+        
+        box.addEventListener('click', () => {
+            const wishNum = box.dataset.wish;
+            const existingWish = localStorage.getItem(`wish_${wishNum}`);
+            
+            if (existingWish) {
+                // Show options to view, edit, or delete
+                const action = prompt(`Wish ${wishNum}: "${existingWish}"\n\nChoose action:\n1. Edit\n2. Delete\n3. Cancel\n\nEnter 1, 2, or 3:`);
+                
+                if (action === '1') {
+                    const newWish = prompt(`Edit your wish #${wishNum}:`, existingWish);
+                    if (newWish && newWish.trim()) {
+                        localStorage.setItem(`wish_${wishNum}`, newWish.trim());
+                        showMessage(`✨ Wish ${wishNum} updated! I'll make it come true! 💖`);
+                    }
+                } else if (action === '2') {
+                    const confirm = window.confirm(`Delete wish #${wishNum}?`);
+                    if (confirm) {
+                        localStorage.removeItem(`wish_${wishNum}`);
+                        box.classList.remove('filled');
+                        box.textContent = wishNum;
+                        showMessage(`🗑️ Wish ${wishNum} deleted!`);
+                    }
+                }
+            } else {
+                const wish = prompt(`Enter your wish #${wishNum}:`);
+                if (wish && wish.trim()) {
+                    localStorage.setItem(`wish_${wishNum}`, wish.trim());
+                    box.classList.add('filled');
+                    box.textContent = '✓';
+                    showMessage(`✨ Wish ${wishNum} saved! I'll make it come true! 💖`);
+                }
+            }
+        });
+    });
+
+    viewWishesBtn.addEventListener('click', () => {
+        let allWishes = 'Axxu\'s Birthday Wishes:\n\n';
+        let hasWishes = false;
+        
+        for (let i = 1; i <= 10; i++) {
+            const wish = localStorage.getItem(`wish_${i}`);
+            if (wish) {
+                allWishes += `${i}. ${wish}\n`;
+                hasWishes = true;
+            } else {
+                allWishes += `${i}. [Empty]\n`;
+            }
+        }
+        
+        if (!hasWishes) {
+            allWishes += '\nNo wishes written yet! 💫';
+        } else {
+            allWishes += '\n💕 I promise to fulfill all of them! - Sam';
+        }
+        
+        alert(allWishes);
+    });
+
+    // --- Utility Functions ---
+    function showMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ff6b9d, #ec4899);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            z-index: 11000;
+            text-align: center;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: messageAppear 0.5s ease-out;
+            max-width: 80%;
+        `;
+        
+        messageDiv.innerHTML = `
+            <div style="margin-bottom: 15px;">${message}</div>
+            <button onclick="this.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Close 💕</button>
+        `;
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes messageAppear {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(() => {
+            if (document.body.contains(messageDiv)) {
+                messageDiv.remove();
+            }
+            style.remove();
+        }, 8000);
     }
 
-    // Insert full letter text into element (shortened in file for preview)
-    // If you want to replace the prefilled letter, edit the innerText below or change server file.
-    const fullLetter = `Beb,\n\nJab main yeh bol raha hoon, toh dil bohot bhaari sa lag raha hai. Mujhe pata hai agar tumne yeh mere jaane se pehle padh liya hota, toh tum mujhe kabhi jaane nahi deti. Isi liye maine tumse kaha tha ki ise baad mein padhna… taki jab main na rahu, tab mere har lafz tumhe mere paas hone ka ehsaas dilate rahe.\n\nKya batau yaar, meri aur tumhari kahani shuru hi itni filmi tareeke se hui thi...\n\n(For full letter, replace this string with the entire Hinglish letter or edit index.html directly.)`;
-    // Note: Because the letter is long, we included a short preview above. To add the whole text, replace the content above with the full letter string.
-    // document.getElementById('loveLetter').innerText = fullLetter;
+    // --- Surprise Modal Logic (Original) ---
+    const surpriseModal = document.getElementById('birthdaySurpriseModal');
+    const modalContent = document.getElementById('modalContent');
+    const giftBox = document.getElementById('giftBox');
+    const surpriseContent = document.getElementById('surpriseContent');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    
+    giftBox.addEventListener('click', () => {
+        giftBox.style.transition = 'transform 0.5s';
+        giftBox.style.transform = 'scale(0)';
+        setTimeout(() => {
+            giftBox.style.display = 'none';
+            surpriseContent.style.display = 'block';
+        }, 500);
+    });
 
-    // small UX: disable surprise until birthday
-    if(new Date() < new Date('2025-09-30T00:00:00')) document.getElementById('surpriseBtn').disabled = false; // keep enabled for demo, change to true to hide
+    const closeModal = () => {
+        modalContent.classList.add('scale-95');
+        surpriseModal.classList.add('opacity-0', 'pointer-events-none');
+    };
+    closeModalBtn.addEventListener('click', closeModal);
+    surpriseModal.addEventListener('click', (e) => {
+        if (e.target === surpriseModal) closeModal();
+    });
 
-  </script>
-</body>
+    // --- Polaroid Photo Gallery ---
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const closeLightbox = document.getElementById('closeLightbox');
+    const images = [
+        { src: 'img1.jpg', caption: 'Eye contacts' },
+        { src: 'img2.jpg', caption: 'Always Smiling' },
+        { src: 'img3.jpg', caption: 'Mahadev - Our destiny planner' },
+        { src: 'img4.jpg', caption: 'Two lovers look at each other' },
+        { src: 'img5.jpg', caption: 'My future wifey' },
+        { src: 'img6.jpg', caption: 'Forever yours' }
+    ];
+    images.forEach((img, i) => {
+        const rotation = Math.random() * 10 - 5; // -5 to 5 degrees
+        const polaroid = document.createElement('div');
+        polaroid.className = 'polaroid';
+        polaroid.style.transform = `rotate(${rotation}deg)`;
+        polaroid.innerHTML = `
+            <img src="${img.src}" alt="${img.caption}" class="cursor-pointer">
+            <div class="polaroid-caption">${img.caption}</div>
+        `;
+        polaroid.querySelector('img').addEventListener('click', () => {
+            lightboxImg.src = img.src;
+            lightbox.classList.remove('hidden');
+        });
+        gallery.appendChild(polaroid);
+    });
+    
+    closeLightbox.addEventListener('click', () => lightbox.classList.add('hidden'));
+    lightbox.addEventListener('click', (e) => {
+        if(e.target === lightbox) lightbox.classList.add('hidden');
+    });
+
+    // --- Love Letter Injection ---
+    const loveLetterEl = document.getElementById('loveLetter');
+    const fullLetterText = `Beb ❤,
+
+Jab main yeh likh raha hoon, toh dil bohot bhaari sa lag raha hai. Mujhe pata hai agar tumne yeh mere jaane se pehle padh liya hota, toh tum mujhe kabhi jaane nahi deti. Isi liye maine tumse kaha tha ki ise baad mein padhna… taki jab main na rahu, tab mere har lafz tumhe mere paas hone ka ehsaas dilate rahe.
+
+Kya batau yaar, meri aur tumhari kahani shuru hi itni filmi tareeke se hui thi. 1 May, 2023 ko, jab Axxu meri didi ki shaadi mein ek guest bankar aayi. Jaise hi maine use dekha, mujhe usse pehli nazar mein hi pyaar ho gaya, kehte hai na love at first sight, par main usse baat nahi kar paaya. Shaadi khatam hui aur hum dono apne-apne shehron mein wapas chale gaye—wo Kota aur main Bihar. Maine uske baad bohot koshish ki use dhoondne ki use contact karne ki, par wo nahi mili. Phir bhi maine himmat nahi haari, aur kuch mahino baad, 31 July, 2023 ko, mujhe uski Instagram ID mil gayi. Humne baat karna shuru kiya, aur jald hi hum ek dusre ke girlfriend aur boyfriend ban gaye. Maine usse promise kiya tha ki main uske liye Kota zaroor aaunga. Aur maine apna vaada poora kiya. 11 April, 2024 ko, main Kota pahunch gaya, aur 6 May, 2024 ko humari mulakaat hui. Tab se lekar aaj tak, humari khoobsurat journey shuru ho gayi.
+
+Tumhari positivity aur bachpana jaisi energy hi hai jo mujhe sabse zyada attract karti hai. Wo chhoti chhoti baaton mein khush ho jana, aur bina wajah sabke chehre par smile laa dena, ye quality bohot rare hai. Jab tum haste hue aankhon se baat karti ho, uss moment mein lagta hai jaise poori duniya ruk gayi hai. Simple kapdon mein bhi tum alag hi glow karti ho. Tumhari woh endless "bak-bak" mujhe bohot pasand hai. Har topic par kuch na kuch kehna, aur beech-beech mein cute se expressions dena, yahi wo cheez hai jo main sabse zyada miss karunga jab tum mere paas nahi hogi. Jab bhi tum udaas hoti ho, sabse pehle mere paas aati ho aur apna saara dard, saari baatein mujhse share karti ho. Aur bas mera use sun lena hi tumhare liye sabse bada comfort ban jaata hai. Jab tum chhoti baaton par muh bana leti ho, lagta hai jaise duniya ki sabse ziddi bachi mere saamne khadi hai. Aur apne chhotu se haath ke jab dono index fingers ko touch karke sign banati ho, toh lagta hai jaise koi innocent cartoon character asli zindagi mein aa gaya ho. Aur sabse zyaada cute tum tab lagti ho jab tum ek bacchi ki tarah aankh pe haath mal ke roti ho. Mera dil bas pighal sa jaata hai. Bas Dil karta hai ek tight hug kardu tumhe.
+
+Humne saath mein kayi yaadein banayi hain yaar, par do aisi hain jo bohot hi khaas hain.
+
+24 June, 2025 (Garadiya Mahadev Trip)
+Wo din ek film jaisa tha. Hum dono scooty par nikle, aur baarish ka mausam poora saath de raha tha. Wo drive kar rahi thi aur main uske peeche baitha tha. Poora raasta baarish ki boondein hum par girti rahi. Garadiya Mahadev pahunchkar humne bachchon ki tarah masti ki, waterfall mein nahaaye, bhaage, daude, aur khoob chillaye. Har baar jab main pahad ke kinaare jaata tha, wo bohot possessive ho jaati thi aur chillati thi, "Sam, tum peeche aao, jaldi aao mere paas, warna pit dungi!" Uska yeh care mujhe andar tak chhoota tha. Aur sabse khoobsurat pal tab tha jab usne sabke saamne mera haath pakad liya aur saath chalti rahi. Ek simple sa scene tha, par mere liye woh pal priceless tha. Raat ko jab hum hostel wapas aaye aur usne mere saath rukkar woh din khatam kiya, toh laga jaise poori duniya se alag humara ek chhota sa corner ban gaya ho.
+
+1 September, 2025 (Bhanwar Kunj + Karneshwar + Gurudwara)
+Yeh trip bhi ek adventure se kam nahi tha. Pehle hum Bhanwar Kunj Waterfall ke liye nikle, par raste mein hi pata chala ki rasta band hai. Phir bhi humne mood kharab nahi hone diya, gaane gaate hue Karneshwar Mahadev nikal gaye. Wahan dono paon paani mein daal kar baithe, promises kiye, baatein ki—jaise humne apni ek chhoti si duniya bana li ho. Uske baad maine usse apne coding se banayi hui ek website gift ki, aur uski aankhon ki khushi dekhne layak thi. Phir chhoti-moti mushkilein aayi—hum galat gurudwara pahunch gaye, scooty ki battery down ho gayi—par humne milkar sab kuch sambhal liya. Mechanic bhaiya se jugaad laga kar free mein charge karwa liya aur phir sahi gurudwara pahunch gaye. Wahan usne scarf se ghunghat liya hua tha aur maine baalon par hankey baandh rakha tha. Us pal mein sach mein laga jaise hum pati-patni hain. Phir hum dono ne langar khaaya, pet bhar ke khush ho gaye, aur ghar wapas aate hue nonstop baatein karte rahe. Yeh poora din adventure, care, aur love ka ek perfect mix tha.
+
+Mujhe sabse zyaada proud tab feel hota hai jab wo mujhe lekar apni jagah stand leti hai. Chahe meri buri aadatein hon ya meri kamiyaan, wo mere saath rehti hai aur mere liye sabse lad jaati hai. Ek baar usne apni bachpan ki dost tak ko chhod diya sirf isliye kyunki wo mere khilaaf bol rahi thi. Us pal mujhe samajh aaya ki uski loyalty kitni high hai. Aur mujhe aur bhi zyaada garv hota hai jab wo mujhe galat cheezon par daantti hai aur samjhati hai. Iska matlab wo sirf support nahi karti, balki mujhe sudharna bhi chahti hai. Jab hum ghoomne jaate hain, uska mere liye extra care karna mujhe hamesha chhoota hai. Wo literally meri mummy jaisa khayal rakhti hai, jaise ek chhota baccha apni maa ki ungli pakad kar ghoom raha ho. Uska yeh combination—ek taraf strong stand lena aur dusri taraf itna care karna—mujhe hamesha proud aur blessed feel karata hai ki wo meri zindagi mein hai.
+
+Mujhe pata hai maine galtiyaan ki hain, aur main maanta hoon ki unmein se kuch aisi hain jinka mujhe hamesha afsos rahega. Sabse badi galti yeh thi ki tere itne kehne ke baad bhi main nasha nahi chhod paaya. Dusra, tera itna pyaar, support, aur bharosa hone ke baad bhi main apni padhai par woh focus nahi de paaya jo dena chahiye tha. Mujhe pata hai maine tujhe dukh pahunchaya hai, aur shayad tujhe yeh mehsoos bhi karwaya ki tera saath mere saath bekaar ho raha hai. Is baat ka dard mujhe hamesha rahega.
+
+Hum dono ne ek dusre ke liye bohot bade sacrifices kiye hain. Mere liye sabse bada effort tere liye Kota aana tha. Jab mere family wale ek taraf khade the aur keh rahe the ki "tujhe main nahi jaane dunga," tab bhi maine apna faisla nahi badla. Main sabse lad jhagad kar, apna comfort aur apna ghar, sab chhod kar sirf tere paas aane ke liye aaya. Kyunki mere liye tu sirf ek choice nahi thi, tu meri zaroorat thi. Aur main aaj proudly keh sakta hoon ki jo bhi struggle aur sacrifice hua, wo sab worth tha, kyunki uske badle mujhe tu mili.
+
+Usne mere liye sabse bada effort tab kiya jab usne apne ghar walon ke khilaaf jaakar bhi mujhe chuna. Uske mummy-papa aur bhaiya ke saamne uska image kharab ho gaya, sirf isliye kyunki usne mujhe apni life ka hissa banaya. Sakht parents ke pressure, unke rules, aur unke mana karne ke bawajood bhi usne mera saath nahi chhoda. Din-raat chhup-chhup kar mujhse baat karti hai, sirf isliye kyunki main uski pehli priority hoon. Mujhe sabse zyaada emotional tab feel hota hai jab main sochta hoon ki usne apne comfort, apne rishte, aur apni izzat tak sacrifice kar di, sirf mujhe apne paas rakhne ke liye. Uska yeh trust aur belief mere liye duniya ki sabse badi cheez hai. Maine uske liye "Shiddat" gaana dedicate kiya hai. Wo sach mein sabse best hai.
+
+Aur hum dono ne apna future bhi plan kar liya hai—12th ke baad IIT clear karke ek hi college mein admission lena, saath rehna, phir main UPSC karke IAS banu, aur uske baad tere papa se officially tera haath maangna. Uske sapne IITian, IAS, aur astronaut banne ke hain. Humari is kahani mein ab ek naya mod aane wala hai, jahan distance ek baar phir humare beech aayega.
+
+Ab shayad sabse mushkil baat kehni pad rahi hai. 22 September ko main yahan se Bihar ja raha hoon. Iske baad, tumhe apna khayal khud rakhna padega. Ab tumhari harkaton par tumhe daantne wala, samjhane wala, sahi-galat ka farq batane wala, tumhe zor se gale lagane wala, pyaar se manane wala, irritate karke hasane wala, tumhare saath golgappe khane wala, aur tumhari galtiyon ke baad tumhare forehead par kiss karke sab maaf kar dene wala, ab tumhare paas roz-roz nahi hoga. Shayad pehle jaise tum apni har chhoti-badi baat turant mujhse share karti thi, ab tumhe thoda strong banna hoga, thoda khud handle karna hoga. Aur mujhe pata hai, tu kar legi, kyunki tu weak nahi hai. Bas, ab Sam apni Axxu ke paas physically nahi hoga. Yeh soch kar hi dil bhar aata hai ki humne yahan jo chhoti si duniya banayi thi, main use chhod kar ja raha hoon.
+
+Par ek baat hamesha yaad rakhna: doori ka matlab judaai nahi hota. Main chahe jitna bhi door rahun, mera dil, meri duaayein, aur mera pyaar—sab kuchh tere paas hamesha rahega. Agar kabhi tujhe lage ki tu akeli hai, toh bas aankh band karna, tujhe meri awaaz, mera touch, aur mera pyaar mehsoos hoga. Haan, yeh aasan nahi hoga. Mujhe bhi tujhe miss karte hue kabhi-kabhi tootne ka mann karega. Lekin phir yaad aayega ki hum "Sam-Axxu" hain. Aur Sam-Axxu ki story aisi hai jo distance se kabhi kam nahi hoti, balki aur strong ho jaati hai. Toh, haan, main jaa raha hoon, par tujhe chhod kar nahi. Main tere saath hoon, har pal, har dua, har dhadkan mein. Yeh chapter thoda tough hai, par agla chapter aur bhi beautiful hoga. Bas ek condition hai: tu hamesha meri Axxu bani rahegi, aur main hamesha tera Sam.
+
+Beb, main bohot kuch sacrifice karke yahan Kota tumhare paas aaya tha, aur ab tu mere liye mujhe hi sacrifice kar rahi hai. Hum dono ke yeh sacrifices kabhi bekaar nahi jaane denge. Main vaada karta hoon, main mehnat karke wahan tak pahunch kar dikhaunga jahan tu mujhe dekhna chahti hai, aur main akela nahi jaunga—tujhe apne saath le jaunga. Jaldi milenge, manifestation mein bohot taaqat hai, my love.
+
+Mujhe kabhi-kabhi lagta hai ki tu apne past se poori tarah move on nahi kar paayi hai, aur wo main mehsoos kar pata hoon. Main chahta hoon ki tu apne past ke bojh se aazaad ho jaaye. Main chahta hoon ki tera aaj itna khoobsurat ho, itna pyaara ho, ki kal ke dino mein tu peeche mudkar dekhe aur bas kahe, 'haan, mera guzar chuka waqt dard bhara tha, par mere aaj ne us sabko theek kar diya'. Main tujhe yeh vaada karta hoon, Axxu, ki tera kal utna hi khoobsurat banaunga jaisa tu sapne mein bhi nahi sochti. Tera haath pakadkar, tera sar apne kandhe par rakhkar, tujhe har aansu se bachana mera maqsad hai. Chahe tu kitni bhi thak jaaye ya kitni bhi toot jaaye, main hamesha tujhe uthakar khada karunga. Tu meri dua hai, meri duaon ka jawaab hai, aur main kabhi apni duaon ko adhura nahi hone dunga.
+
+Mera safar yahi tak tha. Ab is kahani ka agla panna tumhare haathon se likha jaayega. Mujhe poora yaqeen hai ki tum is kahani ko aur bhi khoobsurat banaogi. Mujhe pata hai agar tumne yeh letter mere jaane se pehle padh liya hota, toh tum mujhe kabhi jaane nahi deti. Isi liye maine tumse kaha tha ki ise baad mein padhna, taki jab main na rahun, tab mere har lafz tumhe mere paas hone ka ehsaas dilate rahe.
+
+Forever yours,
+Sam ❤️`;
+    loveLetterEl.textContent = fullLetterText;
+
+   // --- Advanced Music Player ---
+const bgMusic = document.getElementById('bgMusic');
+const shiddatMusic = document.getElementById('shiddatMusic');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const currentSongEl = document.getElementById('currentSong');
+
+let isPlaying = false;
+let currentAudio = shiddatMusic; // Start with Shiddat
+let currentTrack = 0; // Start with Shiddat as first track
+const tracks = [
+    { audio: shiddatMusic, name: 'Shiddat - Our Song' },
+    { audio: bgMusic, name: 'Background Music' }
+];
+
+function updateCurrentSong() {
+    currentSongEl.textContent = tracks[currentTrack].name;
+    currentAudio = tracks[currentTrack].audio;
+}
+
+function togglePlay() {
+    if (isPlaying) {
+        currentAudio.pause();
+        playBtn.textContent = '▶️';
+        isPlaying = false;
+    } else {
+        // Pause other audio
+        tracks.forEach(track => track.audio.pause());
+        currentAudio.play().catch(e => console.log('Audio play failed:', e));
+        playBtn.textContent = '⏸️';
+        isPlaying = true;
+    }
+}
+
+function nextTrack() {
+    currentAudio.pause();
+    currentTrack = (currentTrack + 1) % tracks.length;
+    updateCurrentSong();
+    playBtn.textContent = '▶️';
+    isPlaying = false;
+}
+
+function prevTrack() {
+    currentAudio.pause();
+    currentTrack = currentTrack === 0 ? tracks.length - 1 : currentTrack - 1;
+    updateCurrentSong();
+    playBtn.textContent = '▶️';
+    isPlaying = false;
+}
+
+playBtn.addEventListener('click', togglePlay);
+nextBtn.addEventListener('click', nextTrack);
+prevBtn.addEventListener('click', prevTrack);
+
+updateCurrentSong();
+
+    // --- Enhanced Confetti Logic ---
+    function showConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let confettiPieces = [];
+        const numberOfPieces = 300;
+        const colors = ['#f472b6', '#ec4899', '#a855f7', '#d8b4fe', '#fff', '#ffd700', '#ff6347'];
+
+        function Confetti() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height - canvas.height;
+            this.size = Math.random() * 12 + 5;
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.speed = Math.random() * 5 + 3;
+            this.rotation = Math.random() * 360;
+            this.spin = Math.random() < 0.5 ? -1 : 1;
+            this.spinSpeed = Math.random() * 8 + 2;
+        }
+
+        Confetti.prototype.update = function() {
+            this.y += this.speed;
+            this.rotation += this.spin * this.spinSpeed;
+            if (this.y > canvas.height) {
+                this.y = -20;
+                this.x = Math.random() * canvas.width;
+            }
+        }
+
+        Confetti.prototype.draw = function() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation * Math.PI / 180);
+            ctx.fillStyle = this.color;
+            ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+            ctx.restore();
+        }
+        
+        for (let i = 0; i < numberOfPieces; i++) {
+            confettiPieces.push(new Confetti());
+        }
+
+        let animationFrameId;
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confettiPieces.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            animationFrameId = requestAnimationFrame(animateConfetti);
+        }
+        
+        animateConfetti();
+        
+        setTimeout(() => {
+            cancelAnimationFrame(animationFrameId);
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+        }, 8000); // Stop confetti after 8 seconds
+    }
+});
+</script>
+  </body>
 </html>
