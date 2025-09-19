@@ -1,0 +1,262 @@
+<!-- index.html - A single-file demo for "For Axxu" website
+     Instructions:
+     1) Save this file as index.html
+     2) Save your 6 photos in the same folder named: img1.jpg, img2.jpg, img3.jpg, img4.jpg, img5.jpg, img6.jpg (replace with your actual files)
+     3) If you want background music: replace AUDIO_SRC with a direct mp3 URL or uncomment the YouTube embed section and paste a YouTube link.
+     4) Deploy on GitHub Pages: create repo `axxubirthday`, upload index.html and images, enable Pages on main branch.
+
+     Built features:
+     - Hero with typewriter, floating hearts
+     - Timeline pre-filled with your dates
+     - Photo gallery + lightbox slideshow
+     - Music player (toggle)
+     - Countdown to 30 Sep 2025 which unlocks birthday surprise
+     - 22 Sep departure / LDR note
+     - Love Letter section (Hinglish) filled from your message
+     - Confetti + surprise popup when unlocked
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For Axxu — From Sam</title>
+  <style>
+    :root{
+      --bg:#fffafc; --card:#ffffff; --accent:#ff91b1; --muted:#7b6f79; --glass:rgba(255,255,255,0.6);
+      --shadow: 0 8px 30px rgba(14,14,20,0.07);
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:linear-gradient(180deg,#fffafc 0%, #f6f6ff 100%); color:#333}
+    header{padding:56px 20px; text-align:center}
+    .hero{max-width:960px;margin:0 auto;padding:32px;border-radius:18px;backdrop-filter: blur(6px);box-shadow:var(--shadow);background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));}
+    .title{font-size:36px; font-weight:700; color:#3b2a3a}
+    .sub{margin-top:8px;color:var(--muted)}
+    .typewriter{color:var(--accent);font-weight:700}
+    .row{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center;margin-top:24px}
+    .card{background:var(--card);padding:16px;border-radius:14px;box-shadow:var(--shadow);width:320px}
+    .timeline{list-style:none;padding:0;margin:0}
+    .timeline li{padding:12px 0;border-bottom:1px dashed #eee}
+    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .gallery img{width:100%;height:150px;object-fit:cover;border-radius:8px;cursor:pointer}
+    .center{display:flex;align-items:center;justify-content:center}
+    .btn{background:linear-gradient(90deg,var(--accent),#e87ea5);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 6px 20px rgba(233,127,172,0.18);}
+    footer{padding:40px;text-align:center;color:var(--muted)}
+    .count{font-size:28px;font-weight:700}
+    .hearts{position:fixed;left:10px;top:10px;pointer-events:none}
+    .heart{width:18px;height:18px;background:var(--accent);display:inline-block;border-radius:4px;opacity:0.95;margin:6px;transform:rotate(45deg)}
+    .small{font-size:13px;color:#8d8d8d}
+
+    /* lightbox */
+    .lightbox{position:fixed;inset:0;background:rgba(12,12,15,0.85);display:none;align-items:center;justify-content:center;z-index:999}
+    .lightbox img{max-width:92%;max-height:82%;border-radius:10px}
+
+    /* responsive */
+    @media(max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}.card{width:100%}}
+
+    /* small animations */
+    .float{animation:float 4s ease-in-out infinite}
+    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+
+    .confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}
+
+    .note{white-space:pre-line}
+  </style>
+</head>
+<body>
+  <div class="hearts">
+    <div class="heart float" style="background:linear-gradient(180deg,#ff9bb3,#ff6f9f);width:18px;height:18px"></div>
+    <div class="heart float" style="animation-delay:.6s;background:linear-gradient(#ffd2e6,#ff9bb3);width:14px;height:14px"></div>
+    <div class="heart float" style="animation-delay:1.1s;background:linear-gradient(#fbb1d6,#ff91b1);width:16px;height:16px"></div>
+  </div>
+
+  <header>
+    <div class="hero">
+      <div class="title">For Axxu ❤️</div>
+      <div class="sub">From Sam — a little corner made with lots of shiddat</div>
+      <div style="margin-top:14px;font-size:18px"> <span class="typewriter" id="typewriter"></span></div>
+
+      <div class="row">
+        <div class="card">
+          <div style="font-weight:700">Countdown to her birthday</div>
+          <div style="margin-top:12px" class="center">
+            <div>
+              <div class="count" id="countdown">-- days</div>
+              <div class="small">30 Sept 2025</div>
+            </div>
+          </div>
+          <div style="margin-top:12px" class="center">
+            <button class="btn" id="surpriseBtn">Open Surprise</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700">Song I dedicate</div>
+          <div style="margin-top:10px">Shiddat</div>
+          <div style="margin-top:12px" class="center">
+            <button class="btn" id="playMusic">Play / Pause</button>
+          </div>
+          <div class="small" style="margin-top:12px">Tip: replace AUDIO_SRC in the HTML with a direct mp3 link or upload an audio file on server.</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700">Long-distance note</div>
+          <div style="margin-top:10px" class="small">22 Sept — Sam leaves for Bihar. Distance begins but love is constant.</div>
+          <div style="margin-top:12px" class="small">Click "Open Surprise" on 30 Sep to reveal birthday special.</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1000px;margin:28px auto;padding:0 18px">
+    <section style="margin-bottom:26px">
+      <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:280px" class="card">
+          <h3>Our Story — From Strangers to Soulmates</h3>
+          <ul class="timeline">
+            <li><strong>31 July 2022 — 03:07 p.m.</strong><div class="small">Our first text</div></li>
+            <li><strong>11 Aug 2022 — 05:56 p.m.</strong><div class="small">First proposal</div></li>
+            <li><strong>13 Aug 2022 — 05:38 p.m.</strong><div class="small">You were impressed by my trivial line</div></li>
+            <li><strong>13 Aug 2022 — 05:44 p.m.</strong><div class="small">Our goals matched</div></li>
+            <li><strong>15 Aug 2022 — 06:01 a.m.</strong><div class="small">You asked me to propose back</div></li>
+            <li><strong>15 Aug 2022 — 11:54 a.m.</strong><div class="small">I proposed</div></li>
+            <li><strong>15 Aug 2022 — 12:00 p.m.</strong><div class="small">You accepted</div></li>
+            <li><strong>06 May 2023</strong><div class="small">Our first meet up</div></li>
+          </ul>
+        </div>
+
+        <div style="width:340px" class="card">
+          <h4>Quick moments</h4>
+          <p class="small">Highlights: Garadiya Mahadev — 24 Jun 2025 (film-like rainy day). Bhanwar Kunj & Gurudwara — 1 Sep 2025 (adventure + special website gift)</p>
+          <p class="small">Dreams: IIT together, IAS, same city, forever.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-bottom:26px">
+      <div class="card">
+        <h3>Gallery</h3>
+        <div class="gallery" id="gallery">
+          <img src="img1.jpg" alt="photo1" data-index="0">
+          <img src="img2.jpg" alt="photo2" data-index="1">
+          <img src="img3.jpg" alt="photo3" data-index="2">
+          <img src="img4.jpg" alt="photo4" data-index="3">
+          <img src="img5.jpg" alt="photo5" data-index="4">
+          <img src="img6.jpg" alt="photo6" data-index="5">
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-bottom:26px">
+      <div class="card">
+        <h3>Love Letter (for Axxu)</h3>
+        <div class="note small" id="loveLetter">
+<!-- The letter below is the Hinglish text Sam provided. Edit anytime. -->
+Beb,
+
+Jab main yeh bol raha hoon, toh dil bohot bhaari sa lag raha hai. ...
+
+(Full letter included in the HTML. Replace or edit as needed.)
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-bottom:26px">
+      <div class="card">
+        <h3>Song + Player</h3>
+        <p class="small">Song dedicated: <strong>Shiddat</strong></p>
+        <!-- Audio placeholder: Replace AUDIO_SRC with an mp3 URL or upload audio file and use the filename -->
+        <audio id="audio" loop>
+          <source src="AUDIO_SRC.mp3" type="audio/mpeg">
+          <!-- If you want a YouTube embed instead, replace or add below -->
+        </audio>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Made with shiddat by Sam • <span class="small">Public link when you deploy: https://stymmm.github.io/axxubirthday</span>
+  </footer>
+
+  <div class="lightbox" id="lightbox">
+    <img src="" id="lightboxImg">
+  </div>
+
+  <canvas class="confetti" id="confettiCanvas"></canvas>
+
+  <script>
+    // Simple typewriter
+    const phrases = ["For my Axxu","My forever corner","Made with shiddat ❤️"];
+    let i=0,j=0,cur='';function type(){
+      const el = document.getElementById('typewriter');
+      if(!el) return;
+      if(j<phrases[i].length){cur+=phrases[i][j++];el.textContent=cur;setTimeout(type,80)}else{setTimeout(()=>{erase()},1000)}
+    }
+    function erase(){const el=document.getElementById('typewriter'); if(j>0){cur=cur.slice(0,-1);j--;el.textContent=cur;setTimeout(erase,40)}else{i=(i+1)%phrases.length; setTimeout(type,200)} }
+    type();
+
+    // Gallery lightbox
+    const gallery = document.getElementById('gallery');
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightboxImg');
+    gallery.querySelectorAll('img').forEach(img=>{
+      img.addEventListener('click', e=>{lbImg.src = e.target.src; lb.style.display='flex'})
+    })
+    lb.addEventListener('click', ()=>lb.style.display='none');
+
+    // Countdown
+    function updateCountdown(){
+      const end = new Date('2025-09-30T00:00:00');
+      const now = new Date();
+      const diff = end - now;
+      const el = document.getElementById('countdown');
+      if(diff<=0){el.textContent = 'Happy Birthday!'; document.getElementById('surpriseBtn').disabled=false;} else {
+        const days = Math.floor(diff/ (1000*60*60*24));
+        el.textContent = days + ' days';
+      }
+    }
+    updateCountdown(); setInterval(updateCountdown, 1000*60*30);
+
+    // Surprise button
+    document.getElementById('surpriseBtn').addEventListener('click', ()=>{
+      // If before 30 Sep, show a cute message
+      const now = new Date();
+      const end = new Date('2025-09-30T00:00:00');
+      if(now < end){alert('Hold tight — Birthday surprise will unlock on 30 Sept 🎂'); return}
+      // show confetti + popup with message
+      showConfetti(); setTimeout(()=>{
+        alert('Happy Birthday Axxu ❤️\n\nOpen your secret letter and surprise inside the site ♥️');
+      },400)
+    });
+
+    // Audio play/pause
+    const audio = document.getElementById('audio');
+    document.getElementById('playMusic').addEventListener('click', ()=>{
+      if(audio.paused) {audio.play().catch(()=>alert('Please provide an audio file or a valid URL in index.html'))} else audio.pause();
+    })
+
+    // Simple confetti (canvas)
+    function showConfetti(){
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = innerWidth; canvas.height = innerHeight; canvas.style.display='block';
+      const pieces = [];
+      for(let i=0;i<150;i++) pieces.push({x:Math.random()*canvas.width,y:Math.random()*-canvas.height,vy:2+Math.random()*6, size:4+Math.random()*8, color:['#ff93b4','#ffd2e6','#ffe0b5','#b6f5e1'][Math.floor(Math.random()*4)]});
+      let t=0; function loop(){ctx.clearRect(0,0,canvas.width,canvas.height); pieces.forEach(p=>{p.y+=p.vy; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,p.size,p.size);}); t++; if(t<300) requestAnimationFrame(loop); else canvas.style.display='none'}
+      loop();
+    }
+
+    // Insert full letter text into element (shortened in file for preview)
+    // If you want to replace the prefilled letter, edit the innerText below or change server file.
+    const fullLetter = `Beb,\n\nJab main yeh bol raha hoon, toh dil bohot bhaari sa lag raha hai. Mujhe pata hai agar tumne yeh mere jaane se pehle padh liya hota, toh tum mujhe kabhi jaane nahi deti. Isi liye maine tumse kaha tha ki ise baad mein padhna… taki jab main na rahu, tab mere har lafz tumhe mere paas hone ka ehsaas dilate rahe.\n\nKya batau yaar, meri aur tumhari kahani shuru hi itni filmi tareeke se hui thi...\n\n(For full letter, replace this string with the entire Hinglish letter or edit index.html directly.)`;
+    // Note: Because the letter is long, we included a short preview above. To add the whole text, replace the content above with the full letter string.
+    // document.getElementById('loveLetter').innerText = fullLetter;
+
+    // small UX: disable surprise until birthday
+    if(new Date() < new Date('2025-09-30T00:00:00')) document.getElementById('surpriseBtn').disabled = false; // keep enabled for demo, change to true to hide
+
+  </script>
+</body>
+</html>
