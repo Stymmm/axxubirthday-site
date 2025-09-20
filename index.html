@@ -1786,7 +1786,7 @@ Forever yours,
 Sam ❤️`;
     loveLetterEl.textContent = fullLetterText;
 
-   // --- Advanced Music Player ---
+   // --- Advanced Music Player - FIXED VERSION ---
 const bgMusic = document.getElementById('bgMusic');
 const shiddatMusic = document.getElementById('shiddatMusic');
 const playBtn = document.getElementById('playBtn');
@@ -1794,114 +1794,128 @@ const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const currentSongEl = document.getElementById('currentSong');
 
-// TEMPORARY WORKAROUND - DEBUG SHIDDAT AUDIO
-shiddatMusic.addEventListener('loadstart', () => {
-    console.log('✅ Shiddat loading started');
-});
-
-shiddatMusic.addEventListener('error', (e) => {
-    console.error('❌ Shiddat error details:', {
-        error: shiddatMusic.error,
-        code: shiddatMusic.error?.code,
-        message: shiddatMusic.error?.message,
-        src: shiddatMusic.src
-    });
-    alert('Shiddat file error! Check console for details.');
-});
-
-shiddatMusic.addEventListener('stalled', () => {
-    console.log('⚠️ Shiddat loading stalled');
-});
-
-shiddatMusic.addEventListener('canplay', () => {
-    console.log('✅ Shiddat can play now');
-});
-
-shiddatMusic.addEventListener('loadeddata', () => {
-    console.log('✅ Shiddat data loaded');
-});
-
-shiddatMusic.addEventListener('loadedmetadata', () => {
-    console.log('✅ Shiddat metadata loaded, duration:', shiddatMusic.duration);
-});
-
-// Also add debug for bg music for comparison
-bgMusic.addEventListener('loadstart', () => {
-    console.log('✅ Background music loading started');
-});
-
-bgMusic.addEventListener('error', (e) => {
-    console.error('❌ Background music error:', bgMusic.error);
-});
-
 let isPlaying = false;
-let currentAudio = shiddatMusic; // Start with Shiddat
-let currentTrack = 0; // Start with Shiddat as first track
+let currentAudio = shiddatMusic;
+let currentTrack = 0;
+let currentPlayPromise = null; // IMPORTANT: Track current play promise
+
 const tracks = [
     { audio: shiddatMusic, name: 'Shiddat - Our Song' },
     { audio: bgMusic, name: 'Background Music' }
 ];
 
+// Add audio preload
+shiddatMusic.preload = 'metadata';
+bgMusic.preload = 'metadata';
+
 function updateCurrentSong() {
     currentSongEl.textContent = tracks[currentTrack].name;
     currentAudio = tracks[currentTrack].audio;
-    console.log('🎵 Current track switched to:', tracks[currentTrack].name);
 }
 
-function togglePlay() {
-    console.log('🎯 Play button clicked, current track:', tracks[currentTrack].name);
-    
-    if (isPlaying) {
-        currentAudio.pause();
-        playBtn.textContent = '▶️';
-        isPlaying = false;
-        console.log('⏸️ Audio paused');
-    } else {
-        // Pause other audio
-        tracks.forEach(track => track.audio.pause());
-        
-        console.log('🎵 Attempting to play:', currentAudio.src);
-        
-        currentAudio.play().then(() => {
+async function togglePlay() {
+    try {
+        if (isPlaying) {
+            // SAFE PAUSE: Wait for any pending play promise first
+            if (currentPlayPromise) {
+                await currentPlayPromise.catch(() => {}); // Ignore errors
+            }
+            currentAudio.pause();
+            playBtn.textContent = '▶️';
+            isPlaying = false;
+            currentPlayPromise = null;
+        } else {
+            // SAFE PLAY: Pause all other audio first with promise handling
+            for (const track of tracks) {
+                if (track.audio !== currentAudio && !track.audio.paused) {
+                    track.audio.pause();
+                }
+            }
+            
+            // Reset if ended
+            if (currentAudio.ended) {
+                currentAudio.currentTime = 0;
+            }
+            
+            // Store the play promise
+            currentPlayPromise = currentAudio.play();
+            
+            await currentPlayPromise;
+            
+            // Only update UI if play was successful
             playBtn.textContent = '⏸️';
             isPlaying = true;
-            console.log('✅ Audio playing successfully');
-        }).catch(e => {
-            console.error('❌ Audio play failed:', e);
-            alert('Failed to play: ' + tracks[currentTrack].name + '\nError: ' + e.message);
-        });
+            console.log('✅ Playing:', tracks[currentTrack].name);
+        }
+    } catch (error) {
+        console.error('❌ Playback error:', error);
+        playBtn.textContent = '▶️';
+        isPlaying = false;
+        currentPlayPromise = null;
+        
+        // User-friendly error messages
+        if (error.name === 'NotAllowedError') {
+            alert('Please interact with the page first to enable audio');
+        } else if (error.name === 'AbortError') {
+            console.log('Play interrupted - this is normal when switching tracks');
+        } else {
+            alert(`Cannot play: ${tracks[currentTrack].name}\nError: ${error.message}`);
+        }
     }
 }
 
-function nextTrack() {
-    console.log('⏭️ Next track button clicked');
+async function nextTrack() {
+    // SAFE TRACK SWITCH: Wait for current promise to resolve
+    if (currentPlayPromise) {
+        try {
+            await currentPlayPromise;
+        } catch (e) {
+            // Ignore errors from interrupted play
+        }
+    }
+    
     currentAudio.pause();
     currentTrack = (currentTrack + 1) % tracks.length;
     updateCurrentSong();
     playBtn.textContent = '▶️';
     isPlaying = false;
+    currentPlayPromise = null;
 }
 
-function prevTrack() {
-    console.log('⏮️ Previous track button clicked');
+async function prevTrack() {
+    // SAFE TRACK SWITCH: Wait for current promise to resolve
+    if (currentPlayPromise) {
+        try {
+            await currentPlayPromise;
+        } catch (e) {
+            // Ignore errors from interrupted play
+        }
+    }
+    
     currentAudio.pause();
     currentTrack = currentTrack === 0 ? tracks.length - 1 : currentTrack - 1;
     updateCurrentSong();
     playBtn.textContent = '▶️';
     isPlaying = false;
+    currentPlayPromise = null;
 }
+
+// Handle audio ended event
+tracks.forEach(track => {
+    track.audio.addEventListener('ended', () => {
+        if (track.audio === currentAudio) {
+            playBtn.textContent = '▶️';
+            isPlaying = false;
+            currentPlayPromise = null;
+        }
+    });
+});
 
 playBtn.addEventListener('click', togglePlay);
 nextBtn.addEventListener('click', nextTrack);
 prevBtn.addEventListener('click', prevTrack);
 
 updateCurrentSong();
-
-// Initial file check
-console.log('🔍 Checking audio files:');
-console.log('Shiddat source:', shiddatMusic.src);
-console.log('Background source:', bgMusic.src);
-
 
     // --- Enhanced Confetti Logic ---
     function showConfetti() {
