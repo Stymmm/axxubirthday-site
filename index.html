@@ -795,128 +795,258 @@
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(255,107,157,0.5);
         }
+
+        /* --- NEW: Password Modal Styles --- */
+        #password-modal {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.7s ease-out;
+        }
+
+        .password-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            transform-origin: center;
+            animation: panel-pop-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes panel-pop-in {
+            from { opacity: 0; transform: scale(0.7); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .password-panel.shake {
+            animation: shake-it 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake-it {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--accent-primary);
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 0.2rem;
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.5);
+            transition: all 0.3s ease;
+        }
+        .password-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.4);
+            transform: scale(1.02);
+        }
+
+        .password-button {
+            margin-top: 1.5rem;
+            width: 100%;
+            background: linear-gradient(45deg, var(--accent-secondary), var(--accent-primary));
+            color: white;
+            font-weight: bold;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.3);
+        }
+        .password-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+        }
+        #error-message {
+            color: #ef4444; /* red-500 */
+            margin-top: 1rem;
+            font-weight: 600;
+            min-height: 1.5rem;
+        }
+
+        /* --- NEW: Countdown Timer Styles --- */
+        #countdown {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            background-color: transparent;
+            padding: 0;
+        }
+        .time-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            min-width: 60px;
+        }
+        .time-box span:first-child {
+            font-size: 2.5rem; /* 40px */
+            font-weight: 700;
+            color: var(--accent-secondary);
+        }
+        .time-box span:last-child {
+            font-size: 0.75rem; /* 12px */
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
 </style>
   </head>
   <body class="bg-rose-50 antialiased">
-    <div class="hearts-container" id="hearts-container"></div>
-    <canvas id="confettiCanvas"></canvas>
 
-    <!-- Header Section -->
-	<header class="text-center py-12 px-4 relative overflow-hidden">
-	  <div class="absolute inset-0 bg-gradient-to-b from-pink-200 to-transparent opacity-30"></div>
-	  <div class="relative z-10">
-		<h1 class="font-handwriting text-6xl md:text-8xl text-pink-500 drop-shadow-lg">For My Axxu</h1>
-		<p class="text-violet-800 mt-2 text-xs md:text-sm max-w-xs mx-auto">From Sam — a little universe crafted with all my love, for my favorite star.</p>
+    <!-- NEW: Password Modal -->
+    <div id="password-modal">
+	  <div class="password-panel">
+		<h2 class="font-handwriting text-5xl text-pink-500">Ek Secret...</h2>
+		<p class="text-violet-700 mt-2">Ye jagah sirf humare liye hai. Please password dalo meri jaan!</p>
+		<form id="password-form">
+		  <input type="password" id="password-input" class="password-input" placeholder="Enter Pass baby️">
+		  <div id="error-message"></div>
+		  <button type="submit" class="password-button">Enter My World</button>
+		</form>
 	  </div>
-	</header>
+    </div>
 
-	<main class="max-w-6xl mx-auto px-4 pb-12">
+    <div id="main-content" class="opacity-0 transition-opacity duration-700">
+	  <div class="hearts-container" id="hearts-container"></div>
+	  <canvas id="confettiCanvas"></canvas>
 
-	  <!-- Countdown & LDR Card -->
-	  <section class="mb-12 bg-white rounded-2xl p-6 md:p-8 shadow-lg relative -mt-16 z-20">
-		<div class="flex flex-col md:flex-row items-center justify-between gap-8">
-		  <div class="text-center">
-			<h2 class="text-2xl font-bold text-violet-800 mb-2">The Big Day Countdown</h2>
-			<div id="countdown" class="text-5xl font-bold text-pink-500 bg-pink-100 px-4 py-2 rounded-lg inline-block">-- days</div>
-			<p class="text-sm text-gray-500 mt-2">Until September 30, 2025</p>
-			<button id="surpriseBtn" class="mt-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:scale-105 transform transition-transform shine-effect disabled:opacity-50 disabled:cursor-not-allowed">
-			  Unlock Birthday Surprise
-			</button>
-		  </div>
-		  <div class="w-full md:w-1/2 bg-violet-100 p-4 rounded-lg text-center">
-			<h3 class="font-bold text-violet-800">A Note Across the Miles</h3>
-			<p class="text-sm text-violet-700 mt-2">"Though miles may lie between us, we're never far apart, for love doesn't count the miles, it's measured by the heart."<br/><strong>22 Sept — a new chapter begins.</strong></p>
-		  </div>
+	  <!-- Header Section -->
+	  <header class="text-center py-12 px-4 relative overflow-hidden">
+		<div class="absolute inset-0 bg-gradient-to-b from-pink-200 to-transparent opacity-30"></div>
+		<div class="relative z-10">
+		  <h1 class="font-handwriting text-6xl md:text-8xl text-pink-500 drop-shadow-lg">For My Axxu</h1>
+		  <p class="text-violet-800 mt-2 text-xs md:text-sm max-w-xs mx-auto">From Sam — a little universe crafted with all my love, for my favorite star.</p>
 		</div>
-	  </section>
+	  </header>
 
-	  <!-- Our Story Timeline -->
-	  <section class="mb-12">
-		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">Our Storybook</h2>
-		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-		  <!-- Timeline items will be dynamically inserted here -->
-		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-			<p class="font-bold text-pink-500">31 July 2022</p><p class="text-sm text-gray-600">Our first text. A single notification that changed my world.</p>
-		  </div>
-		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-			<p class="font-bold text-pink-500">15 Aug 2022</p><p class="text-sm text-gray-600">The day you accepted. The day our forever began.</p>
-		  </div>
-		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-			<p class="font-bold text-pink-500">06 May 2024</p><p class="text-sm text-gray-600">Our first meeting. You were even more beautiful than I imagined.</p>
-		  </div>
-		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-			<p class="font-bold text-pink-500">24 Jun 2025</p><p class="text-sm text-gray-600">Garadiya Mahadev. A film-like rainy day, just us against the world.</p>
-		  </div>
-		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-			<p class="font-bold text-pink-500">01 Sep 2025</p><p class="text-sm text-gray-600">Karneshwar Mahadev Adventure. The day we felt like husband and wife at the Gurudwara.</p>
-		  </div>
-		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-			<p class="font-bold text-pink-500">22 sep 2025</p><p class="text-sm text-gray-600">Last Day in Kota, Leaving Your City not your heart.</p>
-		  </div>
-		  <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
-			<p class="font-bold text-pink-500">Today</p><p class="text-sm text-gray-600">Making more memories, still in living in flasbacks, falling in love with you more each second.</p>
-		  </div>
-		</div>
-	  </section>
+	  <main class="max-w-6xl mx-auto px-4 pb-12">
 
-	  <!-- Photo Gallery -->
-	  <section class="mb-12">
-		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">A Polaroid of Us</h2>
-		<div id="gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-		  <!-- Images will be injected here -->
-		</div>
-	  </section>
-
-	  <!-- Love Letter -->
-	  <section class="mb-12">
-		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">A Letter from My Heart</h2>
-		<div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
-		  <div class="love-letter" id="loveLetter">
-			<!-- Letter content is injected by JS -->
+		<!-- Countdown & LDR Card -->
+		<section class="mb-12 bg-white rounded-2xl p-6 md:p-8 shadow-lg relative -mt-16 z-20">
+		  <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+			<div class="text-center flex-1">
+			  <h2 class="text-2xl font-bold text-violet-800 mb-4">The Big Day Countdown</h2>
+			  <!-- UPDATED: Countdown Timer Structure -->
+			  <div id="countdown">
+				<div class="time-box"><span id="days">0</span><span>Days</span></div>
+				<div class="time-box"><span id="hours">0</span><span>Hours</span></div>
+				<div class="time-box"><span id="minutes">0</span><span>Mins</span></div>
+				<div class="time-box"><span id="seconds">0</span><span>Secs</span></div>
+			  </div>
+			  <p class="text-sm text-gray-500 mt-2">Until September 30, 2025</p>
+			  <button id="surpriseBtn" class="mt-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:scale-105 transform transition-transform shine-effect disabled:opacity-50 disabled:cursor-not-allowed">
+				Unlock Birthday Surprise
+			  </button>
+			  
+			</div>
+			<div class="w-full md:w-1/2 bg-violet-100 p-4 rounded-lg text-center">
+			  <h3 class="font-bold text-violet-800">A Note Across the Miles</h3>
+			  <p class="text-sm text-violet-700 mt-2">"Though miles may lie between us, we're never far apart, for love doesn't count the miles, it's measured by the heart."<br/><strong>22 Sept — a new chapter begins.</strong></p>
+			</div>
 		  </div>
-		</div>
-	  </section>
+		</section>
 
-	  <!-- Music Section - SIMPLIFIED -->
-	  <section class="mb-12">
-		<h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">Our Song</h2>
-		<div class="music-section">
-		  <h3 class="text-2xl font-bold mb-2">Shiddat — Our Dedicated Song</h3>
-		  <p class="mb-4">Because that's what I feel for you, infinite shiddat ❤️</p>
-
-		  <div class="music-controls">
-            <button class="control-btn play-btn" id="playBtn">▶️</button>
+		<!-- Our Story Timeline -->
+		<section class="mb-12">
+		  <h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">Our Storybook</h2>
+		  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+			<!-- Timeline items will be dynamically inserted here -->
+			<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			  <p class="font-bold text-pink-500">31 July 2022</p><p class="text-sm text-gray-600">Our first text. A single notification that changed my world.</p>
+			</div>
+			<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			  <p class="font-bold text-pink-500">15 Aug 2022</p><p class="text-sm text-gray-600">The day you accepted. The day our forever began.</p>
+			</div>
+			<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			  <p class="font-bold text-pink-500">06 May 2024</p><p class="text-sm text-gray-600">Our first meeting. You were even more beautiful than I imagined.</p>
+			</div>
+			<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			  <p class="font-bold text-pink-500">24 Jun 2025</p><p class="text-sm text-gray-600">Garadiya Mahadev. A film-like rainy day, just us against the world.</p>
+			</div>
+			<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			  <p class="font-bold text-pink-500">01 Sep 2025</p><p class="text-sm text-gray-600">Karneshwar Mahadev Adventure. The day we felt like husband and wife at the Gurudwara.</p>
+			</div>
+			<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			  <p class="font-bold text-pink-500">22 sep 2025</p><p class="text-sm text-gray-600">Last Day in Kota, Leaving Your City not your heart.</p>
+			</div>
+			<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow transform hover:-translate-y-1">
+			  <p class="font-bold text-pink-500">Today</p><p class="text-sm text-gray-600">Making more memories, still in living in flasbacks, falling in love with you more each second.</p>
+			</div>
 		  </div>
+		</section>
 
-		  <div class="mt-4">
-            <p id="currentSong" class="text-sm opacity-90">Shiddat - Our Song</p>
+		<!-- Photo Gallery -->
+		<section class="mb-12">
+		  <h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">A Polaroid of Us</h2>
+		  <div id="gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+			<!-- Images will be injected here -->
 		  </div>
+		</section>
 
-		  <!-- Only Shiddat Audio -->
-		  <audio id="shiddatMusic" preload="metadata">
-            <source src="shiddat.mp3" type="audio/mpeg">
-		  </audio>
-		</div>
-	  </section>
+		<!-- Love Letter -->
+		<section class="mb-12">
+		  <h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">A Letter from My Heart</h2>
+		  <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+			<div class="love-letter" id="loveLetter">
+			  <!-- Letter content is injected by JS -->
+			</div>
+		  </div>
+		</section>
 
-		  <!-- Hidden Audio Elements -->
-		  <audio id="bgMusic" loop>
-			<source src="bg-music.mp3" type="audio/mpeg">
-		  </audio>
-		  <audio id="shiddatMusic">
-			<source src="shiddat.mp3" type="audio/mpeg">
-		  </audio>
-		</div>
-	  </section>
+		<!-- Music Section - SIMPLIFIED -->
+		<section class="mb-12">
+		  <h2 class="font-handwriting text-5xl text-center mb-8 text-violet-800">Our Song</h2>
+		  <div class="music-section">
+			<h3 class="text-2xl font-bold mb-2">Shiddat — Our Dedicated Song</h3>
+			<p class="mb-4">Because that's what I feel for you, infinite shiddat ❤️</p>
 
-    </main>
+			<div class="music-controls">
+			  <button class="control-btn play-btn" id="playBtn">▶️</button>
+			</div>
 
-    <footer class="text-center py-8 text-violet-800 text-sm">
+			<div class="mt-4">
+			  <p id="currentSong" class="text-sm opacity-90">Shiddat - Our Song</p>
+			</div>
+
+			<!-- Only Shiddat Audio -->
+			<audio id="shiddatMusic" preload="metadata">
+			  <source src="shiddat.mp3" type="audio/mpeg">
+			</audio>
+		  </div>
+		</section>
+
+		<!-- Hidden Audio Elements -->
+		<audio id="bgMusic" loop>
+		  <source src="bg-music.mp3" type="audio/mpeg">
+		</audio>
+	</div>
+	</section>
+
+	</main>
+
+	<footer class="text-center py-8 text-violet-800 text-sm">
 	  <p>Made with shiddat by your Sam, forever and always ❤️</p>
-    </footer>
+	</footer>
 
-    <!-- Birthday Surprise Modal -->
-    <div id="birthdaySurpriseModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[999] opacity-0 pointer-events-none">
+	<!-- Birthday Surprise Modal -->
+	<div id="birthdaySurpriseModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[999] opacity-0 pointer-events-none">
 	  <div id="modalContent" class="bg-gradient-to-br from-rose-100 to-violet-200 rounded-2xl p-8 max-w-lg w-full text-center shadow-2xl transform scale-95 transition-transform duration-500">
 		<div id="giftBox">
 		  <h2 class="font-handwriting text-5xl text-violet-800">Happy Birthday, My Love!</h2>
@@ -931,10 +1061,10 @@
 		  <button id="closeModalBtn" class="mt-6 bg-white text-pink-500 font-bold py-2 px-6 rounded-full shadow-md hover:bg-pink-50 transition-colors">Close</button>
 		</div>
 	  </div>
-    </div>
+	</div>
 
-    <!-- Advanced Birthday Surprise Screen -->
-    <div id="birthdayScreen" class="fixed inset-0 z-[10000] hidden overflow-y-auto">
+	<!-- Advanced Birthday Surprise Screen -->
+	<div id="birthdayScreen" class="fixed inset-0 z-[10000] hidden overflow-y-auto">
 	  <div class="min-h-screen p-2">
 		<!-- Header -->
 		<div class="text-center py-4 relative">
@@ -1073,10 +1203,10 @@
 		  </div>
 		</div>
 	  </div>
-    </div>
+	</div>
 
-    <!-- Video Modal -->
-    <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[10001] hidden">
+	<!-- Video Modal -->
+	<div id="videoModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[10001] hidden">
 	  <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4">
 		<div class="flex justify-between items-center mb-4">
 		  <h3 class="text-xl font-bold">Special Video Message ❤️</h3>
@@ -1086,19 +1216,50 @@
 		  <source src="surprise-video.mp4" type="video/mp4">
 		</video>
 	  </div>
-    </div>
+	</div>
 
-    <!-- Lightbox for Gallery - UPDATED Z-INDEX -->
+	<!-- Lightbox for Gallery - UPDATED Z-INDEX -->
 	<div id="lightbox" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[10001] hidden p-4">
 	  <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl">
 	  <button id="closeLightbox" class="absolute top-4 right-4 text-white text-4xl">&times;</button>
 	</div>
-	
+    </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Sound effects (using Web Audio API for realistic sounds)
+    // --- NEW: Password Protection Logic ---
+    const passwordModal = document.getElementById('password-modal');
+    const passwordForm = document.getElementById('password-form');
+    const passwordInput = document.getElementById('password-input');
+    const errorMessage = document.getElementById('error-message');
+    const mainContent = document.getElementById('main-content');
+    const correctPassword = 'ourforever'; // Aap yahan password badal sakte hain
+
+    passwordForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const enteredPassword = passwordInput.value;
+        const panel = passwordModal.querySelector('.password-panel');
+
+        if (enteredPassword === correctPassword) {
+            errorMessage.textContent = '';
+            passwordModal.style.opacity = '0';
+            setTimeout(() => {
+                passwordModal.style.display = 'none';
+                mainContent.style.opacity = '1';
+            }, 700);
+        } else {
+            errorMessage.textContent = 'Wrong password! Phir se try karo...';
+            panel.classList.add('shake');
+            passwordInput.value = '';
+            setTimeout(() => {
+                panel.classList.remove('shake');
+            }, 500);
+        }
+    });
+
+    // --- Sound effects (using Web Audio API for realistic sounds) ---
     function playSound(type) {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let frequency, duration;
@@ -1147,7 +1308,6 @@ document.addEventListener('DOMContentLoaded', () => {
         heart.style.width = `${10 + Math.random() * 15}px`;
         heart.style.height = heart.style.width;
         
-        // Adjust psuedo elements size as well
         const style = document.createElement('style');
         const heartId = `heart-${Date.now()}-${Math.random()}`;
         heart.id = heartId;
@@ -1169,8 +1329,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     setInterval(createHeart, 500);
 
-    // --- Countdown Logic ---
-    const countdownEl = document.getElementById('countdown');
+    // --- UPDATED: Countdown Logic ---
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
     const surpriseBtn = document.getElementById('surpriseBtn');
     const targetDate = new Date('2025-09-30T00:00:00');
 
@@ -1179,178 +1342,207 @@ document.addEventListener('DOMContentLoaded', () => {
         const diff = targetDate - now;
 
         if (diff <= 0) {
-            countdownEl.textContent = 'Happy Birthday!';
-            countdownEl.classList.add('animate-pulse');
+            daysEl.textContent = '0';
+            hoursEl.textContent = '0';
+            minutesEl.textContent = '0';
+            secondsEl.textContent = '0';
+            document.querySelector('#countdown').innerHTML = `<div class="text-3xl font-bold text-pink-500 animate-pulse">Happy Birthday!</div>`;
             surpriseBtn.disabled = false;
+            clearInterval(countdownInterval); // Stop the timer
         } else {
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            countdownEl.textContent = `${days} days`;
-            surpriseBtn.disabled = true; // Set to true for real deployment
-            // For DEMO purposes, let's keep it enabled. Change to true above to lock it.
-            surpriseBtn.disabled = false;
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            daysEl.textContent = days;
+            hoursEl.textContent = hours.toString().padStart(2, '0');
+            minutesEl.textContent = minutes.toString().padStart(2, '0');
+            secondsEl.textContent = seconds.toString().padStart(2, '0');
+            surpriseBtn.disabled = true;
         }
     };
+    
     updateCountdown();
-    setInterval(updateCountdown, 1000 * 60 * 30); // update every 30 mins
+    const countdownInterval = setInterval(updateCountdown, 1000);
 
     // --- Advanced Birthday Screen Logic ---
-const birthdayScreen = document.getElementById('birthdayScreen');
-const closeBirthdayScreen = document.getElementById('closeBirthdayScreen');
+    const birthdayScreen = document.getElementById('birthdayScreen');
+    const closeBirthdayScreen = document.getElementById('closeBirthdayScreen');
 
-surpriseBtn.addEventListener('click', () => {
-    const now = new Date();
-    if (now < targetDate && surpriseBtn.disabled) {
-         // A nicer alert
-        const tempAlert = document.createElement('div');
-        tempAlert.textContent = 'Patience, my love! The best surprises are worth waiting for. 🎂';
-        tempAlert.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:white; color:var(--text-primary); padding:10px 20px; border-radius:20px; box-shadow:var(--shadow); z-index:9999;';
-        document.body.appendChild(tempAlert);
-        setTimeout(() => tempAlert.remove(), 3000);
-        return;
-    }
-    
-    birthdayScreen.classList.remove('hidden');
-    generateBalloons();
-    generateGiftBoxes();
-    generateScratchCards();
-    addAxxuPhotosClickHandler(); // ADD THIS LINE
-    showConfetti();
-});
-
-// Fixed close button
-closeBirthdayScreen.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    birthdayScreen.classList.add('hidden');
-});
-
-// ADD THIS FUNCTION
-function addAxxuPhotosClickHandler() {
-    const axxuPhotos = document.querySelectorAll('#axxuPhotos img');
-    axxuPhotos.forEach(photo => {
-        photo.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const lightbox = document.getElementById('lightbox');
-            const lightboxImg = document.getElementById('lightboxImg');
-            lightboxImg.src = photo.src;
-            lightbox.classList.remove('hidden');
-        });
+    surpriseBtn.addEventListener('click', () => {
+        const now = new Date();
+        if (now < targetDate) {
+            // UPDATED: Cute message
+            const tempAlert = document.createElement('div');
+            tempAlert.innerHTML = 'Bas thoda sabar aur karlo meri jaan, <br> kuchh bohot special hai iske andar... ❤️';
+            tempAlert.style.cssText = `
+                position:fixed; 
+                top:20px; 
+                left:50%; 
+                transform:translateX(-50%); 
+                background: linear-gradient(45deg, var(--accent-secondary), var(--accent-primary));
+                color: white; 
+                padding: 15px 25px; 
+                border-radius:20px; 
+                box-shadow:var(--shadow); 
+                z-index:99999; 
+                text-align: center;
+                font-weight: 600;
+                animation: fadeInOut 4s ease-in-out;
+            `;
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0%, 100% { opacity: 0; transform: translate(-50%, -20px); }
+                    10%, 90% { opacity: 1; transform: translate(-50%, 0); }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(tempAlert);
+            setTimeout(() => {
+                tempAlert.remove();
+                style.remove();
+            }, 4000);
+            return;
+        }
+        
+        birthdayScreen.classList.remove('hidden');
+        generateBalloons();
+        generateGiftBoxes();
+        generateScratchCards();
+        addAxxuPhotosClickHandler();
+        showConfetti();
     });
-}
 
+    closeBirthdayScreen.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        birthdayScreen.classList.add('hidden');
+    });
 
-    // --- Enhanced Birthday Cake Logic (UPDATED) ---
-const birthdayCake = document.getElementById('birthdayCake');
-birthdayCake.addEventListener('click', () => {
-    showCenterCake();
-});
+    function addAxxuPhotosClickHandler() {
+        const axxuPhotos = document.querySelectorAll('#axxuPhotos img');
+        axxuPhotos.forEach(photo => {
+            photo.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const lightbox = document.getElementById('lightbox');
+                const lightboxImg = document.getElementById('lightboxImg');
+                lightboxImg.src = photo.src;
+                lightbox.classList.remove('hidden');
+            });
+        });
+    }
 
-function showCenterCake() {
-    const centerModal = document.createElement('div');
-    centerModal.className = 'center-cake-modal';
-    
-    centerModal.innerHTML = `
-        <div class="center-cake">
-            <div style="width: 270px; height: 120px; background: linear-gradient(45deg, #8B4513, #CD853F, #DEB887); border-radius: 20px 20px 60px 60px; position: absolute; bottom: 30px; left: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);"></div>
-            <div style="width: 240px; height: 90px; background: linear-gradient(45deg, #FFB6C1, #FFC0CB, #FFE4E1); border-radius: 15px 15px 45px 45px; position: absolute; bottom: 120px; left: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.4);"></div>
-            <div style="width: 210px; height: 75px; background: linear-gradient(45deg, #FF69B4, #FFB6C1, #FFF0F5); border-radius: 12px 12px 35px 35px; position: absolute; bottom: 180px; left: 45px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);"></div>
-            <div class="center-candle" id="centerCandle">
-                <div class="center-flame" id="centerFlame"></div>
+    // --- BAAKI SARA CODE PEHLE JAISA HI HAI ---
+    // ...(The rest of the JS code remains unchanged)...
+    const birthdayCake = document.getElementById('birthdayCake');
+    birthdayCake.addEventListener('click', () => {
+        showCenterCake();
+    });
+
+    function showCenterCake() {
+        const centerModal = document.createElement('div');
+        centerModal.className = 'center-cake-modal';
+        
+        centerModal.innerHTML = `
+            <div class="center-cake">
+                <div style="width: 270px; height: 120px; background: linear-gradient(45deg, #8B4513, #CD853F, #DEB887); border-radius: 20px 20px 60px 60px; position: absolute; bottom: 30px; left: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);"></div>
+                <div style="width: 240px; height: 90px; background: linear-gradient(45deg, #FFB6C1, #FFC0CB, #FFE4E1); border-radius: 15px 15px 45px 45px; position: absolute; bottom: 120px; left: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.4);"></div>
+                <div style="width: 210px; height: 75px; background: linear-gradient(45deg, #FF69B4, #FFB6C1, #FFF0F5); border-radius: 12px 12px 35px 35px; position: absolute; bottom: 180px; left: 45px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);"></div>
+                <div class="center-candle" id="centerCandle">
+                    <div class="center-flame" id="centerFlame"></div>
+                </div>
             </div>
-        </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <button id="cutCakeBtn" style="background: linear-gradient(45deg, #ff6b9d, #ec4899); color: white; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">🔪 Cut Cake</button>
-        </div>
-    `;
-    
-    document.body.appendChild(centerModal);
-    
-    const cutCakeBtn = centerModal.querySelector('#cutCakeBtn');
-    const centerFlame = centerModal.querySelector('#centerFlame');
-    
-    cutCakeBtn.addEventListener('click', () => {
-        // Cake cutting animation
-        cutCakeBtn.style.transform = 'scale(0)';
-        cutCakeBtn.style.opacity = '0';
-        
-        // Add cake cutting effect
-        const cakeDiv = centerModal.querySelector('.center-cake');
-        cakeDiv.style.animation = 'cakeCut 1s ease-out forwards';
-        
-        // Add cutting animation style
-        const cuttingStyle = document.createElement('style');
-        cuttingStyle.textContent = `
-            @keyframes cakeCut {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1) rotateZ(2deg); }
-                100% { transform: scale(1.05) rotateZ(0deg); filter: brightness(1.2); }
-            }
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="cutCakeBtn" style="background: linear-gradient(45deg, #ff6b9d, #ec4899); color: white; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">🔪 Cut Cake</button>
+            </div>
         `;
-        document.head.appendChild(cuttingStyle);
         
-        setTimeout(() => {
-            playSound('blow');
-            centerFlame.style.opacity = '0';
-            centerFlame.style.transform = 'scale(0)';
+        document.body.appendChild(centerModal);
+        
+        const cutCakeBtn = centerModal.querySelector('#cutCakeBtn');
+        const centerFlame = centerModal.querySelector('#centerFlame');
+        
+        cutCakeBtn.addEventListener('click', () => {
+            cutCakeBtn.style.transform = 'scale(0)';
+            cutCakeBtn.style.opacity = '0';
+            
+            const cakeDiv = centerModal.querySelector('.center-cake');
+            cakeDiv.style.animation = 'cakeCut 1s ease-out forwards';
+            
+            const cuttingStyle = document.createElement('style');
+            cuttingStyle.textContent = `
+                @keyframes cakeCut {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1) rotateZ(2deg); }
+                    100% { transform: scale(1.05) rotateZ(0deg); filter: brightness(1.2); }
+                }
+            `;
+            document.head.appendChild(cuttingStyle);
             
             setTimeout(() => {
-                showConfetti();
-                showBirthdayMessage();
+                playSound('blow');
+                centerFlame.style.opacity = '0';
+                centerFlame.style.transform = 'scale(0)';
+                
                 setTimeout(() => {
-                    centerModal.remove();
-                    cuttingStyle.remove();
-                }, 3000);
-            }, 500);
-        }, 1000);
-    });
-}
+                    showConfetti();
+                    showBirthdayMessage();
+                    setTimeout(() => {
+                        centerModal.remove();
+                        cuttingStyle.remove();
+                    }, 3000);
+                }, 500);
+            }, 1000);
+        });
+    }
 
-function showBirthdayMessage() {
-    const messageDiv = document.createElement('div');
-    messageDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(45deg, #ff6b9d, #ec4899);
-        color: white;
-        padding: 40px;
-        border-radius: 25px;
-        z-index: 12000;
-        text-align: center;
-        font-size: 1.3rem;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        animation: messageAppear 0.8s ease-out;
-        max-width: 90%;
-    `;
-    
-    messageDiv.innerHTML = `
-        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">🎂 Happy 18th Birthday! 🎂</h2>
-        <p style="margin-bottom: 15px;">Cake Cut Successfully!</p>
-        <p style="margin-bottom: 25px;">Your Dreams Will Come True! ✨</p>
-        <button onclick="this.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem;">Amazing! 💕</button>
-    `;
-    
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes messageAppear {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
-            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        }
-    `;
-    document.head.appendChild(style);
-    document.body.appendChild(messageDiv);
-    
-    setTimeout(() => {
-        if (document.body.contains(messageDiv)) {
-            messageDiv.remove();
-        }
-        style.remove();
-    }, 15000);
-}
+    function showBirthdayMessage() {
+        const messageDiv = document.createElement('div');
+        messageDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ff6b9d, #ec4899);
+            color: white;
+            padding: 40px;
+            border-radius: 25px;
+            z-index: 12000;
+            text-align: center;
+            font-size: 1.3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            animation: messageAppear 0.8s ease-out;
+            max-width: 90%;
+        `;
+        
+        messageDiv.innerHTML = `
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">🎂 Happy 18th Birthday! 🎂</h2>
+            <p style="margin-bottom: 15px;">Cake Cut Successfully!</p>
+            <p style="margin-bottom: 25px;">Your Dreams Will Come True! ✨</p>
+            <button onclick="this.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem;">Amazing! 💕</button>
+        `;
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes messageAppear {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+                100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(() => {
+            if (document.body.contains(messageDiv)) {
+                messageDiv.remove();
+            }
+            style.remove();
+        }, 15000);
+    }
 
-    // --- Enhanced Balloon Logic ---
     function generateBalloons() {
         const balloonGame = document.getElementById('balloonGame');
         const balloonData = [
@@ -1369,26 +1561,21 @@ function showBirthdayMessage() {
             balloonGame.appendChild(balloonEl);
         });
         
-        // Add balloon click handlers
         balloonGame.querySelectorAll('.balloon').forEach(balloon => {
             balloon.addEventListener('click', () => {
                 const item = balloon.dataset.item;
-                
-                // Pop animation with sound
                 balloon.classList.add('popped');
                 playSound('pop');
                 
-                // Create burst animation
                 setTimeout(() => {
                     createBurstAnimation(item);
                 }, 150);
                 
-                // Check if all balloons popped
                 setTimeout(() => {
                     const remainingBalloons = balloonGame.querySelectorAll('.balloon:not(.popped)');
                     if (remainingBalloons.length === 0) {
                         setTimeout(() => {
-                            generateBalloons(); // Regenerate balloons
+                            generateBalloons();
                         }, 2000);
                     }
                 }, 300);
@@ -1399,142 +1586,99 @@ function showBirthdayMessage() {
     function createBurstAnimation(item) {
         const burstDiv = document.createElement('div');
         burstDiv.className = 'burst-animation';
+        burstDiv.innerHTML = `<div class="burst-item" style="font-size: 4rem;">${item}</div>`;
+        document.body.appendChild(burstDiv);
+        setTimeout(() => burstDiv.remove(), 2000);
+    }
+
+    function generateGiftBoxes() {
+        const giftBoxes = document.getElementById('giftBoxes');
+        const gifts = [
+            { type: 'icecream', name: '🍦 Sweet Ice Cream' },
+            { type: 'chocolate', name: '🍫 Delicious Chocolate' },
+            { type: 'car', name: '🚗 Dream Car' },
+            { type: 'lollipop', name: '🍭 Colorful Lollipop' }
+        ];
         
-        burstDiv.innerHTML = `
-            <div class="burst-item" style="font-size: 4rem;">${item}</div>
+        giftBoxes.innerHTML = '';
+        gifts.forEach((gift) => {
+            const giftBox = document.createElement('div');
+            giftBox.className = 'gift-box';
+            giftBox.dataset.gift = gift.type;
+            giftBox.dataset.name = gift.name;
+            giftBoxes.appendChild(giftBox);
+        });
+            
+        giftBoxes.querySelectorAll('.gift-box').forEach(box => {
+            box.addEventListener('click', () => {
+                const giftType = box.dataset.gift;
+                const giftName = box.dataset.name;
+                
+                playSound('unwrap');
+                box.style.animation = 'none';
+                box.style.transform = 'scale(0)';
+                
+                setTimeout(() => show3DGiftCenter(giftType, giftName), 300);
+                
+                setTimeout(() => {
+                    if (giftBoxes.querySelectorAll('.gift-box:not([style*="scale(0)"])').length === 0) {
+                        setTimeout(() => generateGiftBoxes(), 3000);
+                    }
+                }, 500);
+            });
+        });
+    }
+
+    function show3DGiftCenter(type, name) {
+        const giftModal = document.createElement('div');
+        giftModal.className = 'gift-center-modal';
+        
+        let itemHTML = '';
+        switch(type) {
+            case 'icecream': itemHTML = '<div class="item-3d icecream-3d"></div>'; break;
+            case 'chocolate': itemHTML = '<div class="item-3d chocolate-3d"></div>'; break;
+            case 'car': itemHTML = '<div class="item-3d car-3d"></div>'; break;
+            case 'lollipop': itemHTML = '<div class="item-3d lollipop-3d"></div>'; break;
+        }
+        
+        giftModal.innerHTML = `
+            <div style="text-align: center; color: white;">
+                ${itemHTML}
+                <h3 style="font-size: 2rem; margin: 20px 0; color: white;">${name}</h3>
+                <button onclick="this.parentElement.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem;">Thank You! 💕</button>
+            </div>
         `;
         
-        document.body.appendChild(burstDiv);
+        document.body.appendChild(giftModal);
         
         setTimeout(() => {
-            burstDiv.remove();
-        }, 2000);
+            if (document.body.contains(giftModal)) giftModal.remove();
+        }, 3000);
     }
 
-    // --- Enhanced Gift Boxes (UPDATED) ---
-function generateGiftBoxes() {
-    const giftBoxes = document.getElementById('giftBoxes');
-    const gifts = [
-        { type: 'icecream', name: '🍦 Sweet Ice Cream' },
-        { type: 'chocolate', name: '🍫 Delicious Chocolate' },
-        { type: 'car', name: '🚗 Dream Car' },
-        { type: 'lollipop', name: '🍭 Colorful Lollipop' }
-    ];
-    
-    giftBoxes.innerHTML = '';
-    gifts.forEach((gift, index) => {
-        const giftBox = document.createElement('div');
-        giftBox.className = 'gift-box';
-        giftBox.dataset.gift = gift.type;
-        giftBox.dataset.name = gift.name;
-        giftBoxes.appendChild(giftBox);
-    });
-        
-        // Add gift box click handlers
-    giftBoxes.querySelectorAll('.gift-box').forEach(box => {
-        box.addEventListener('click', () => {
-            const giftType = box.dataset.gift;
-            const giftName = box.dataset.name;
-            
-            playSound('unwrap');
-            box.style.animation = 'none';
-            box.style.transform = 'scale(0)';
-            
-            setTimeout(() => {
-                show3DGiftCenter(giftType, giftName);
-            }, 300);
-            
-            // Check if all gifts are opened
-            setTimeout(() => {
-                const remainingGifts = giftBoxes.querySelectorAll('.gift-box:not([style*="scale(0)"])');
-                if (remainingGifts.length === 0) {
-                    setTimeout(() => {
-                        generateGiftBoxes(); // Regenerate gift boxes
-                    }, 3000);
-                }
-            }, 500);
-        });
-    });
-}
-
-function show3DGiftCenter(type, name) {
-    const giftModal = document.createElement('div');
-    giftModal.className = 'gift-center-modal';
-    
-    let itemHTML = '';
-    switch(type) {
-        case 'icecream':
-            itemHTML = '<div class="item-3d icecream-3d"></div>';
-            break;
-        case 'chocolate':
-            itemHTML = '<div class="item-3d chocolate-3d"></div>';
-            break;
-        case 'car':
-            itemHTML = '<div class="item-3d car-3d"></div>';
-            break;
-        case 'lollipop':
-            itemHTML = '<div class="item-3d lollipop-3d"></div>';
-            break;
-    }
-    
-    giftModal.innerHTML = `
-        <div style="text-align: center; color: white;">
-            ${itemHTML}
-            <h3 style="font-size: 2rem; margin: 20px 0; color: white;">${name}</h3>
-            <button onclick="this.parentElement.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 15px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 1.1rem;">Thank You! 💕</button>
-        </div>
-    `;
-    
-    document.body.appendChild(giftModal);
-    
-    setTimeout(() => {
-        if (document.body.contains(giftModal)) {
-            giftModal.remove();
-        }
-    }, 3000);
-}
-
-    // --- Enhanced Scratch Cards ---
     function generateScratchCards() {
         const scratchCards = document.getElementById('scratchCards');
-        const messages = [
-            'I love you mera bachha 🌍',
-            'Forever mine! 💕',
-            'Best girlfriend ever! 👸',
-            'Meri jaan! 💖'
-        ];
+        const messages = ['I love you mera bachha 🌍', 'Forever mine! 💕', 'Best girlfriend ever! 👸', 'Meri jaan! 💖'];
         
         scratchCards.innerHTML = '';
         messages.forEach(message => {
             const card = document.createElement('div');
             card.className = 'scratch-card';
             card.dataset.message = message;
-            
-            card.innerHTML = `
-                <div class="scratch-overlay">Scratch Me!</div>
-                <div class="scratch-content">${message}</div>
-            `;
-            
+            card.innerHTML = `<div class="scratch-overlay">Scratch Me!</div><div class="scratch-content">${message}</div>`;
             scratchCards.appendChild(card);
         });
         
-        // Add scratch card handlers
         scratchCards.querySelectorAll('.scratch-card').forEach(card => {
             card.addEventListener('click', () => {
                 const overlay = card.querySelector('.scratch-overlay');
-                const message = card.dataset.message;
-                
                 overlay.style.opacity = '0';
                 overlay.style.transform = 'scale(1.2)';
-                
-                setTimeout(() => {
-                    showMessage(message);
-                }, 500);
+                setTimeout(() => showMessage(card.dataset.message), 500);
             });
         });
     }
 
-    // --- Voice Message ---
     const playVoiceBtn = document.getElementById('playVoiceBtn');
     const birthdayVoice = document.getElementById('birthdayVoice');
     playVoiceBtn.addEventListener('click', () => {
@@ -1547,7 +1691,6 @@ function show3DGiftCenter(type, name) {
         }
     });
 
-    // --- Video Message ---
     const playVideoBtn = document.getElementById('playVideoBtn');
     const videoModal = document.getElementById('videoModal');
     const closeVideoModal = document.getElementById('closeVideoModal');
@@ -1570,18 +1713,13 @@ function show3DGiftCenter(type, name) {
         }
     });
 
-    // --- Enhanced Confetti Button (UPDATED) ---
     const confettiBtn = document.getElementById('confettiBtn');
-    confettiBtn.addEventListener('click', () => {
-        showConfetti(); // Full screen confetti only
-    });
+    confettiBtn.addEventListener('click', () => showConfetti());
 
-    // --- Enhanced Wish Tree Logic ---
     const wishBoxes = document.querySelectorAll('.wish-box');
     const viewWishesBtn = document.getElementById('viewWishesBtn');
 
     wishBoxes.forEach(box => {
-        // Check if wish exists and update appearance
         const wishNum = box.dataset.wish;
         const existingWish = localStorage.getItem(`wish_${wishNum}`);
         if (existingWish) {
@@ -1594,18 +1732,16 @@ function show3DGiftCenter(type, name) {
             const existingWish = localStorage.getItem(`wish_${wishNum}`);
             
             if (existingWish) {
-                // Show options to view, edit, or delete
-                const action = prompt(`Wish ${wishNum}: "${existingWish}"\n\nChoose action:\n1. Edit\n2. Delete\n3. Cancel\n\nEnter 1, 2, or 3:`);
+                const action = prompt(`Wish ${wishNum}: "${existingWish}"\n\nChoose action:\n1. Edit\n2. Delete\n3. Cancel`, '3');
                 
                 if (action === '1') {
                     const newWish = prompt(`Edit your wish #${wishNum}:`, existingWish);
                     if (newWish && newWish.trim()) {
                         localStorage.setItem(`wish_${wishNum}`, newWish.trim());
-                        showMessage(`✨ Wish ${wishNum} updated! I'll make it come true! 💖`);
+                        showMessage(`✨ Wish ${wishNum} updated!`);
                     }
                 } else if (action === '2') {
-                    const confirm = window.confirm(`Delete wish #${wishNum}?`);
-                    if (confirm) {
+                    if (confirm(`Delete wish #${wishNum}?`)) {
                         localStorage.removeItem(`wish_${wishNum}`);
                         box.classList.remove('filled');
                         box.textContent = wishNum;
@@ -1638,59 +1774,31 @@ function show3DGiftCenter(type, name) {
             }
         }
         
-        if (!hasWishes) {
-            allWishes += '\nNo wishes written yet! 💫';
-        } else {
-            allWishes += '\n💕 I promise to fulfill all of them! - Sam';
-        }
-        
-        alert(allWishes);
+        alert(hasWishes ? allWishes + '\n💕 I promise to fulfill all of them! - Sam' : allWishes + '\nNo wishes written yet! 💫');
     });
 
-    // --- Utility Functions ---
     function showMessage(message) {
         const messageDiv = document.createElement('div');
         messageDiv.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(45deg, #ff6b9d, #ec4899);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            z-index: 11000;
-            text-align: center;
-            font-size: 1.1rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: messageAppear 0.5s ease-out;
-            max-width: 80%;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ff6b9d, #ec4899); color: white;
+            padding: 20px 30px; border-radius: 15px; z-index: 11000; text-align: center;
+            font-size: 1.1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: messageAppear 0.5s ease-out; max-width: 80%;
         `;
-        
-        messageDiv.innerHTML = `
-            <div style="margin-bottom: 15px;">${message}</div>
-            <button onclick="this.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Close 💕</button>
-        `;
+        messageDiv.innerHTML = `<div style="margin-bottom: 15px;">${message}</div><button onclick="this.parentElement.remove()" style="background: white; color: #ff6b9d; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Close 💕</button>`;
         
         const style = document.createElement('style');
-        style.textContent = `
-            @keyframes messageAppear {
-                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-                100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            }
-        `;
+        style.textContent = `@keyframes messageAppear { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }`;
         document.head.appendChild(style);
         document.body.appendChild(messageDiv);
         
         setTimeout(() => {
-            if (document.body.contains(messageDiv)) {
-                messageDiv.remove();
-            }
+            if (document.body.contains(messageDiv)) messageDiv.remove();
             style.remove();
         }, 8000);
     }
 
-    // --- Surprise Modal Logic (Original) ---
     const surpriseModal = document.getElementById('birthdaySurpriseModal');
     const modalContent = document.getElementById('modalContent');
     const giftBox = document.getElementById('giftBox');
@@ -1715,28 +1823,21 @@ function show3DGiftCenter(type, name) {
         if (e.target === surpriseModal) closeModal();
     });
 
-    // --- Polaroid Photo Gallery ---
     const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
     const closeLightbox = document.getElementById('closeLightbox');
     const images = [
-        { src: 'img1.jpg', caption: 'Eye contacts' },
-        { src: 'img2.jpg', caption: 'Always Smiling' },
-        { src: 'img3.jpg', caption: 'Mahadev - Our destiny planner' },
-        { src: 'img4.jpg', caption: 'Two lovers look at each other' },
-        { src: 'img5.jpg', caption: 'My future wifey' },
-        { src: 'img6.jpg', caption: 'Forever yours' }
+        { src: 'img1.jpg', caption: 'Eye contacts' }, { src: 'img2.jpg', caption: 'Always Smiling' },
+        { src: 'img3.jpg', caption: 'Mahadev - Our destiny planner' }, { src: 'img4.jpg', caption: 'Two lovers look at each other' },
+        { src: 'img5.jpg', caption: 'My future wifey' }, { src: 'img6.jpg', caption: 'Forever yours' }
     ];
-    images.forEach((img, i) => {
-        const rotation = Math.random() * 10 - 5; // -5 to 5 degrees
+    images.forEach((img) => {
+        const rotation = Math.random() * 10 - 5;
         const polaroid = document.createElement('div');
         polaroid.className = 'polaroid';
         polaroid.style.transform = `rotate(${rotation}deg)`;
-        polaroid.innerHTML = `
-            <img src="${img.src}" alt="${img.caption}" class="cursor-pointer">
-            <div class="polaroid-caption">${img.caption}</div>
-        `;
+        polaroid.innerHTML = `<img src="${img.src}" alt="${img.caption}" class="cursor-pointer"><div class="polaroid-caption">${img.caption}</div>`;
         polaroid.querySelector('img').addEventListener('click', () => {
             lightboxImg.src = img.src;
             lightbox.classList.remove('hidden');
@@ -1791,94 +1892,30 @@ Forever yours,
 Sam ❤️`;
     loveLetterEl.textContent = fullLetterText;
 
-   // --- Simplified Music Player - ONLY SHIDDAT ---
-const shiddatMusic = document.getElementById('shiddatMusic');
-const playBtn = document.getElementById('playBtn');
-const currentSongEl = document.getElementById('currentSong');
-
-let isPlaying = false;
-let currentPlayPromise = null;
-
-// Preload audio for faster loading
-shiddatMusic.preload = 'metadata';
-
-// Update song name
-currentSongEl.textContent = 'Shiddat - Our Song';
-
-async function togglePlay() {
-    try {
-        if (isPlaying) {
-            // SAFE PAUSE: Wait for any pending play promise
-            if (currentPlayPromise) {
-                await currentPlayPromise.catch(() => {}); 
+    const shiddatMusic = document.getElementById('shiddatMusic');
+    const playBtn = document.getElementById('playBtn');
+    let isPlaying = false;
+    async function togglePlay() {
+        try {
+            if (isPlaying) {
+                shiddatMusic.pause();
+            } else {
+                await shiddatMusic.play();
             }
-            shiddatMusic.pause();
-            playBtn.textContent = '▶️';
+            isPlaying = !isPlaying;
+            playBtn.textContent = isPlaying ? '⏸️' : '▶️';
+        } catch (error) {
+            console.error('Playback error:', error);
             isPlaying = false;
-            currentPlayPromise = null;
-            console.log('⏸️ Shiddat paused');
-        } else {
-            // Reset if ended
-            if (shiddatMusic.ended) {
-                shiddatMusic.currentTime = 0;
-            }
-            
-            console.log('🎵 Starting Shiddat...');
-            
-            // Store and await the play promise
-            currentPlayPromise = shiddatMusic.play();
-            await currentPlayPromise;
-            
-            // Success - update UI
-            playBtn.textContent = '⏸️';
-            isPlaying = true;
-            console.log('✅ Shiddat playing successfully!');
-        }
-    } catch (error) {
-        console.error('❌ Shiddat playback error:', error);
-        playBtn.textContent = '▶️';
-        isPlaying = false;
-        currentPlayPromise = null;
-        
-        // Handle different error types
-        if (error.name === 'NotAllowedError') {
-            alert('Please click somewhere on the page first to enable audio');
-        } else if (error.name === 'AbortError') {
-            console.log('Play interrupted - normal behavior');
-        } else {
-            console.error('Failed to play Shiddat:', error.message);
+            playBtn.textContent = '▶️';
         }
     }
-}
-
-// Handle when song ends
-shiddatMusic.addEventListener('ended', () => {
-    playBtn.textContent = '▶️';
-    isPlaying = false;
-    currentPlayPromise = null;
-    console.log('🔚 Shiddat ended');
-});
-
-// Add event listeners for debugging
-shiddatMusic.addEventListener('loadstart', () => {
-    console.log('📥 Shiddat loading started');
-});
-
-shiddatMusic.addEventListener('canplay', () => {
-    console.log('✅ Shiddat ready to play');
-});
-
-shiddatMusic.addEventListener('error', (e) => {
-    console.error('❌ Shiddat file error:', shiddatMusic.error);
-});
-
-playBtn.addEventListener('click', togglePlay);
-
-console.log('🎵 Shiddat Music Player Initialized');
-console.log('File source:', shiddatMusic.src);
-
-
-    // --- Enhanced Confetti Logic ---
+    playBtn.addEventListener('click', togglePlay);
+    shiddatMusic.addEventListener('ended', () => {
+        isPlaying = false;
+        playBtn.textContent = '▶️';
+    });
+    
     function showConfetti() {
         const canvas = document.getElementById('confettiCanvas');
         const ctx = canvas.getContext('2d');
@@ -1924,10 +1961,7 @@ console.log('File source:', shiddatMusic.src);
         let animationFrameId;
         function animateConfetti() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            confettiPieces.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            confettiPieces.forEach(p => p.draw(p.update()));
             animationFrameId = requestAnimationFrame(animateConfetti);
         }
         
@@ -1936,9 +1970,11 @@ console.log('File source:', shiddatMusic.src);
         setTimeout(() => {
             cancelAnimationFrame(animationFrameId);
             ctx.clearRect(0,0,canvas.width, canvas.height);
-        }, 8000); // Stop confetti after 8 seconds
+        }, 8000);
     }
-});
+
+}); 
 </script>
   </body>
 </html>
+
